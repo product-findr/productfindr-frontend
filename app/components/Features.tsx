@@ -16,10 +16,11 @@ const Features: React.FC = () => {
             Features
           </h2>
           <div className="mt-6">
-            <p className="text-lg sm:text-xl md:text-2xl font-light text-[#282828]">
+            <p className="text-sm sm:text-base md:text-lg font-light text-[#282828]">
               Check out our amazing features and experience
             </p>
-            <span className="block text-lg sm:text-xl md:text-2xl text-[#282828]">
+
+            <span className="text-sm sm:text-base md:text-lg font-light text-[#282828]">
               Productfind<span className="text-[#9B30FF]">R</span>
             </span>
           </div>

@@ -16,7 +16,7 @@ const Techstack: React.FC = () => {
       <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
           <div className="text-center">
-            <h2 className="text-3xl leading-tight text-[#1E1E1E] mt-16">
+            <h2 className="text-2xl sm:text-3xl leading-tight text-[#1E1E1E] mt-8 md:mt-16">
               Using Top Technologies such as
             </h2>
           </div>

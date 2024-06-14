@@ -8,13 +8,15 @@ const Earning: React.FC = () => {
           Earn as a User 💸
         </h2>
         <div className="space-y-2 py-4">
-          <p className="text-base sm:text-lg text-[#282828] text-center">
-            Unlock the power of beta testing onchain with ProductfindR. Launch your product
+          <p className="text-xs sm:text-sm text-[#282828] text-center">
+            Unlock the power of beta testing onchain with ProductfindR. Launch
+            your product
           </p>
-          <p className="text-base sm:text-lg text-[#282828] text-center">
+          <p className="text-xs sm:text-sm text-[#282828] text-center">
             and get transparent reviews to our thousands of users.
           </p>
         </div>
+
         <button className="bg-[#9B30FF] text-[#FFFFFF] text-lg sm:text-xl font-bold py-3 px-10 rounded-full mt-4">
           Start earning
         </button>
