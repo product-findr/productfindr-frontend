@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex items-center justify-center">
+      <body>
         <OnchainProviders>{children}</OnchainProviders>
       </body>
     </html>

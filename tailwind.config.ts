@@ -1,3 +1,4 @@
+// tailwind.config.js
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -9,12 +10,22 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-landing": "linear-gradient(180deg, #9B30FF 0%, #37006A 33.33%, #9B30FF 75%, #FFFFFF 100%)",
+      },
+      fontFamily: {
+        montserrat: ['Montserrat', 'sans-serif'],
+      },
+      fontSize: {
+        'custom-size': '17.33px',
+        '7xl': '5rem',
+      },
+      lineHeight: {
+        'custom-line': '13px',
+        '80': '80px',
       },
     },
   },
   plugins: [],
 };
+
 export default config;
