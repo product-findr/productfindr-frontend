@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
         <div className="text-white flex flex-col space-y-6">
           <div className="mt-4">
             <h2 className="text-2xl font-bold mb-2">Address</h2>
-            <p className="text-gray-300">Lagos island, Lagos state, Nigeria.</p> {/* Changed to <p> for address */}
+            <p className="text-gray-300">Onchain</p> {/* Changed to <p> for address */}
           </div>
           <div className="mt-4">
             <h2 className="text-2xl font-bold mb-2">Social Link</h2>
