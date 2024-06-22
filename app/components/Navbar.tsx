@@ -25,9 +25,9 @@ const Navbar: React.FC = () => {
             <ul className="flex space-x-6 mt-1">
               <li className="group relative text-lg">
                 <Link
-                  href={"/launch-product"}
+                  href={"/launch"}
                   className={`${
-                    pathname === "/launch-product"
+                    pathname === "/launch"
                       ? "text-[#ECECEC]"
                       : "text-white"
                   }`}
@@ -77,7 +77,7 @@ const Navbar: React.FC = () => {
           <div className="md:hidden py-4 pl-4">
             <ul className="flex flex-col space-y-3">
               <li className="text-lg mt-4">
-                <a href="/launch-product" className="text-[#ECECEC]">
+                <a href="/launch" className="text-[#ECECEC]">
                   Launch a product
                 </a>
               </li>

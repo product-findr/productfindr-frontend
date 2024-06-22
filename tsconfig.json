@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/assets/constant.js", "app/components/LaunchForm.ja", "app/components/LaunchForm.js", "constant/constant.js", "app/api/files/route.js", "app/api/files/route.js", "app/api/files/route.js"],
   "exclude": ["node_modules"]
 }

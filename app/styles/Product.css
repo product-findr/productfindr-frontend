@@ -1,0 +1,22 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    background-color: white;
+}
+
+/* ProductSidebar.css */
+.sidebar-button {
+  font-size: xx-small; /* Adjust the font size as needed */
+  margin-left: 1rem; /* Adjust the padding-left as needed */
+}
+
+
+@media only screen and (max-width: 600px) {
+  :root {
+    font-size: xx-small;
+  }
+}

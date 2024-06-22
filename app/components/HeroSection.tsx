@@ -30,7 +30,7 @@ const HeroSection: React.FC = () => {
               Start to earn
             </button>
             <button className="border text-[#ECECEC] text-base sm:text-lg font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-full">
-              Launch a product
+              <a href="/launch"> Launch a product</a>
             </button>
           </div>
         </div>

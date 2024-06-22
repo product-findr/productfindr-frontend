@@ -26,3 +26,4 @@ const Earning: React.FC = () => {
 };
 
 export default Earning;
+ 
