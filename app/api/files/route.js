@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const maxDuration = 5
 
 export async function POST(request) {
   try {
