@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import TimerIcon from "../assets/timer-icon.png";
 import { useWriteContract } from "wagmi";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
@@ -22,6 +23,10 @@ const LaunchForm = () => {
     loomLink: "",
     workedWithTeam: false,
     teamMembersInput: "",
+    pricingOption: "",
+    offer: "",
+    promoCode: "",
+    expirationDate: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -34,6 +39,8 @@ const LaunchForm = () => {
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false);
   const [mediaFileCid, setMediaFileCid] = useState("");
   const [launch, setLaunch] = useState(false);
+
+  const [success, setSuccess] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
 
@@ -120,6 +127,10 @@ const LaunchForm = () => {
       });
 
       const resData = await res.json();
+      if (!res.ok) {
+        throw new Error(resData.message || "Upload failed");
+      }
+
       if (field === "thumbNail") {
         setThumbNailCid(resData.IpfsHash);
         setUploadingThumbNail(false);
@@ -131,6 +142,12 @@ const LaunchForm = () => {
         ...prevFormData,
         [field]: resData.IpfsHash,
       }));
+
+      // Clear the error for this field on successful upload
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: "",
+      }));
     } catch (error) {
       console.error("Failed attempt: ", error);
       if (field === "thumbNail") {
@@ -138,9 +155,15 @@ const LaunchForm = () => {
       } else {
         setUploadingMediaFile(false);
       }
-      alert("Trouble uploading file");
+
+      // Set the error message for the field
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: "Failed to upload. Please retry.",
+      }));
     }
   };
+
   const handleThumbNailChange = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -194,6 +217,13 @@ const LaunchForm = () => {
       if (error) valid2 = false;
     });
     if (valid2) setStep(3);
+    const part3Field = ["teamMembersInput"];
+    let valid3 = true;
+    part3Field.forEach((field) => {
+      const error = validateField(field, formData[field] || "");
+      if (error) valid3 = false;
+    });
+    if (valid3) setStep(4);
   };
 
   const handleSubmit = async (e) => {
@@ -212,6 +242,10 @@ const LaunchForm = () => {
       "mediaFile",
       "loomLink",
       "teamMembersInput",
+      "pricingOption",
+      "offer",
+      "promoCode",
+      "expirationDate",
     ];
 
     let isValid = true;
@@ -251,9 +285,15 @@ const LaunchForm = () => {
       const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
       });
-      alert("Product listed successfully!");
-      window.location.reload();
-      setLaunch(false);
+      console.log(transactionReceipt.status);
+
+      if (transactionReceipt.status === "success") {
+        setSuccess(true);
+        setLaunch(false);
+      } else {
+        alert("Failed to list product. Please try again.");
+        setLaunch(false);
+      }
     } catch (error) {
       console.error("Failed Tx", error);
       alert("Failed to list product. Please try again.");
@@ -265,9 +305,9 @@ const LaunchForm = () => {
     <div className="bg-[#2828280D] container mx-auto py-2 px-4 sm:px-6 lg:px-8 p-8 rounded-2xl">
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
-      </h2>{" "}
+      </h2>
       <form
-        onSubmit={step < 3 ? handleNext : handleSubmit}
+        onSubmit={step < 4 ? handleNext : handleSubmit}
         className="space-y-4 p-4"
       >
         {step === 1 && (
@@ -589,14 +629,13 @@ const LaunchForm = () => {
         )}{" "}
         {step === 3 && (
           <>
-            {" "}
             <h3 className="text-[#282828] text-2xl mb-6 text-start py-6">
-              Builders / team{" "}
-            </h3>{" "}
+              Builders / team
+            </h3>
             <div>
               <label className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base">
-                We would like to know if you worked on this alone or with a team{" "}
-              </label>{" "}
+                We would like to know if you worked on this alone or with a team
+              </label>
               <div className="flex flex-col">
                 <label className="mb-2">
                   <input
@@ -614,8 +653,8 @@ const LaunchForm = () => {
                     className="form-radio h-4 w-4 text-gray-700 transition duration-150 ease-in-out mr-2"
                     required
                   />
-                  Yes, i worked on building the product alone{" "}
-                </label>{" "}
+                  Yes, i worked on building the product alone
+                </label>
                 <label className="mb-2">
                   <input
                     type="radio"
@@ -632,19 +671,19 @@ const LaunchForm = () => {
                     className="form-radio h-4 w-4 text-gray-700 transition duration-150 ease-in-out mr-2"
                     required
                   />
-                  I built it with my team members{" "}
-                </label>{" "}
-              </div>{" "}
-              {errors.workedWithTeam && <p> {errors.workedWithTeam} </p>}{" "}
-            </div>{" "}
+                  I built it with my team members
+                </label>
+              </div>
+              {errors.workedWithTeam && <p> {errors.workedWithTeam} </p>}
+            </div>
             <div>
               <label
                 htmlFor="teamMembersInput"
                 className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
               >
-                Who worked on this project👥{" "}
-                <span className="text-[#9B30FF] pl-2"> * </span>{" "}
-              </label>{" "}
+                Who worked on this project👥
+                <span className="text-[#9B30FF] pl-2"> * </span>
+              </label>
               <input
                 type="text"
                 id="teamMembersInput"
@@ -654,25 +693,202 @@ const LaunchForm = () => {
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
                 placeholder="Kindly add anyone who worked on this product"
-              />{" "}
+              />
               {errors.teamMembersInput && (
                 <p className="text-red-500 text-xs md:text-sm">
-                  {" "}
                   {errors.teamMembersInput}{" "}
                 </p>
-              )}{" "}
-            </div>{" "}
+              )}
+            </div>
+
             <div className="text-right">
               <button
                 type="submit"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-xs md:text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                {launch ? "submitting..." : "Submit"}{" "}
-              </button>{" "}
-            </div>{" "}
+                Next
+              </button>
+            </div>
           </>
-        )}{" "}
-      </form>{" "}
+        )}
+        {step === 4 && (
+          <>
+            {success === true ? (
+              <>
+                <div class="text-center">
+                  <h2 class="text-[#9B30FF] text-3xl font-bold mb-6">
+                    Congratulations 🎉
+                  </h2>
+                  <p class="text-lg">
+                    You have successfully launched your product.
+                  </p>
+                  <Image
+                    src={TimerIcon}
+                    alt="success"
+                    class="rounded-lg mt-6 mx-auto"
+                    width={400}
+                    height={300}
+                  />
+                  <p class="text-lg mt-6">
+                    While you wait 24hrs for our onchain analysis, you can set
+                    up a beta testing program for the product.
+                  </p>
+                  <div class="mt-6 flex justify-center space-x-4">
+                    <button class="bg-[#ECECEC] text-[#0B081C] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2">
+                      &lt;&lt; No, I just want to launch
+                    </button>
+                    <button class="bg-white border-[1px] border-[#9B30FF] text-[#9B30FF] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2">
+                      Set up a beta testing ⚙️️
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-start mb-6">
+                  <h3 className="text-[#282828] text-2xl mb-6 text-start py-6">
+                    Pricing
+                  </h3>
+                  <div className="text-start mb-6">
+                    <p className="text-md text-gray-600 mb-8">
+                      Optional, but we will appreciate knowing:
+                    </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            className="form-radio text-indigo-600"
+                            name="pricingOption"
+                            value="free"
+                            checked={formData.pricingOption === "free"}
+                            onChange={handleChange}
+                          />
+                          <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
+                            Free
+                          </span>
+                        </label>
+                        <p className="text-sm text-gray-500 ml-6">
+                          This product is free to use
+                        </p>
+                      </div>
+                      <div>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            className="form-radio text-indigo-600"
+                            name="pricingOption"
+                            value="paid"
+                            checked={formData.pricingOption === "paid"}
+                            onChange={handleChange}
+                          />
+                          <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
+                            Paid
+                          </span>
+                        </label>
+                        <p className="text-sm text-gray-500 ml-6">
+                          This product requires payment and there's no free
+                          coupon
+                        </p>
+                      </div>
+                      <div>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            className="form-radio text-indigo-600"
+                            name="pricingOption"
+                            value="paidWithTrial"
+                            checked={formData.pricingOption === "paidWithTrial"}
+                            onChange={handleChange}
+                          />
+                          <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
+                            Paid (with a free trial or plan)
+                          </span>
+                        </label>
+                        <p className="text-sm text-gray-500 ml-6">
+                          This product requires payment with a free trial or
+                          plan
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-start mb-6">
+                  <p className="font-bold text-md text-gray-600 mb-8">
+                    Promo code 🆓
+                  </p>
+                  <p className="text-md text-gray-600 mb-8">
+                    If you’d like to offer a promo code for the ProductfindR
+                    community, you can add it here.
+                  </p>
+                  <div className="flex flex-wrap space-x-4">
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-bold text-gray-700 mb-2"
+                        htmlFor="offer"
+                      >
+                        What is the offer
+                      </label>
+                      <input
+                        type="text"
+                        id="offer"
+                        name="offer"
+                        placeholder="2 months free"
+                        value={formData.offer}
+                        onChange={handleChange}
+                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-bold text-gray-700 mb-2"
+                        htmlFor="promoCode"
+                      >
+                        Promo code
+                      </label>
+                      <input
+                        type="text"
+                        id="promoCode"
+                        name="promoCode"
+                        placeholder="PFR300WWW"
+                        value={formData.promoCode}
+                        onChange={handleChange}
+                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-bold text-gray-700 mb-2"
+                        htmlFor="expirationDate"
+                      >
+                        Expiration date
+                      </label>
+                      <input
+                        type="date"
+                        id="expirationDate"
+                        name="expirationDate"
+                        placeholder="None"
+                        value={formData.expirationDate}
+                        onChange={handleChange}
+                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-xs md:text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    {launch ? "submitting..." : "Submit"}
+                  </button>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </form>
     </div>
   );
 };
