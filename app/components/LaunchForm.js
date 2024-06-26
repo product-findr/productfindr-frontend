@@ -787,9 +787,9 @@ const LaunchForm = () => {
                           </span>
                         </label>
                         <p className="text-sm text-gray-500 ml-6">
-                          This product requires payment and there's no free
-                          coupon
-                        </p>
+  This product requires payment and there&apos;s no free coupon
+</p>
+
                       </div>
                       <div>
                         <label className="inline-flex items-center">
