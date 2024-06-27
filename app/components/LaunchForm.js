@@ -8,6 +8,7 @@ import { waitForTransactionReceipt } from "wagmi/actions";
 import Image from "next/image";
 import { ProductfindrAddress } from "../../constant/constant";
 import { ProductfindrABI } from "../../constant/constant";
+import Link from "next/link";
 
 const LaunchForm = () => {
   const [formData, setFormData] = useState({
@@ -591,7 +592,7 @@ const LaunchForm = () => {
             </div>{" "}
             <div>
               <label
-                htmlFor="twitterLink"
+                htmlFor="loomLink"
                 className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
               >
                 Loom Video Link🔗{" "}
@@ -734,12 +735,18 @@ const LaunchForm = () => {
                     up a beta testing program for the product.
                   </p>
                   <div class="mt-6 flex justify-center space-x-4">
-                    <button class="bg-[#ECECEC] text-[#0B081C] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2">
+                    <Link
+                      href="/"
+                      className="bg-[#ECECEC] text-[#0B081C] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2"
+                    >
                       &lt;&lt; No, I just want to launch
-                    </button>
-                    <button class="bg-white border-[1px] border-[#9B30FF] text-[#9B30FF] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2">
+                    </Link>
+                    <Link
+                      href="/beta-testing"
+                      className="bg-white border-[1px] border-[#9B30FF] text-[#9B30FF] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2"
+                    >
                       Set up a beta testing ⚙️️
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </>
@@ -787,9 +794,9 @@ const LaunchForm = () => {
                           </span>
                         </label>
                         <p className="text-sm text-gray-500 ml-6">
-  This product requires payment and there&apos;s no free coupon
-</p>
-
+                          This product requires payment and there&apos;s no free
+                          coupon
+                        </p>
                       </div>
                       <div>
                         <label className="inline-flex items-center">

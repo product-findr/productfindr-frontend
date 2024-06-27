@@ -22,17 +22,17 @@ const ProductNavbar: React.FC = () => {
   return (
     <>
       <nav className="py-2 md:py-2">
-        <div className="container mx-auto flex justify-between items-center py-2 pl-4">
+        <div className="container mx-auto flex justify-between items-center py-2 px-4">
           <div>
             <Link href="/">
               <Image src={Logo} alt="Productfindr Logo" className="w-18 h-9" />
             </Link>
           </div>
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block flex-grow mx-4">
             <input
               type="text"
               placeholder="Search..."
-              className="bg-[#2828280D] pl-12 py-2 rounded-full text-black w-80 md:w-96"
+              className="bg-[#2828280D] pl-12 py-2 rounded-full text-black w-full max-w-md"
             />
             <div className="absolute left-0 top-0 mt-3 ml-3">
               <svg
@@ -51,32 +51,32 @@ const ProductNavbar: React.FC = () => {
               </svg>
             </div>
           </div>
-          <div className="hidden md:flex space-x-6">
-            <ul className="flex space-x-6 mt-1">
+          <div className="hidden md:flex space-x-6 items-center">
+            <ul className="flex space-x-6">
               <li className="group relative text-lg">
                 <Link
-                  href={"/product"}
+                  href="/product"
                   className={`${
                     pathname === "/product"
                       ? "text-[#9B30FF]"
                       : "text-[#282828]"
                   }`}
-                  aria-label="Go to Home"
+                  aria-label="Go to Products"
                 >
                   Products
                 </Link>
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 origin-bottom transition-transform"></div>
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
               </li>
               <li className="group relative text-lg">
                 <Link
-                  href={"/launch"}
+                  href="/launch"
                   className={`${
                     pathname === "/launch" ? "text-[#9B30FF]" : "text-[#282828]"
                   }`}
                 >
                   Launch Product
                 </Link>
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 origin-bottom transition-transform"></div>
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
               </li>
             </ul>
             <div>
@@ -97,7 +97,7 @@ const ProductNavbar: React.FC = () => {
                   </button>
                 ) : (
                   <button
-                    key={connector.uid} // Added key for each button
+                    key={connector.uid}
                     type="button"
                     className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-full text-lg flex items-center space-x-2"
                     onClick={() => connect({ connector })}

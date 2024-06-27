@@ -5,6 +5,7 @@ import HeroImagePage from "./components/HeroImage";
 import Techstack from "./components/Techstack";
 import Features from "./components/Features";
 import Testimonial from "./components/Testimonial";
+import FAQ from "./components/FAQ";
 import Earning from "./components/Earning";
 import Launch from "./components/Launch";
 import Footer from "./components/Footer";
@@ -20,6 +21,7 @@ export default function Page() {
     <Techstack />
     <Features />
     <Testimonial />
+    <FAQ />
     <Earning />
     <Launch />
     <Footer />

@@ -1,4 +1,3 @@
-// Launch.js
 import React from "react";
 import ProductNavbar from "../components/ProductNavbar";
 import LaunchForm from "../components/LaunchForm";

@@ -10,15 +10,11 @@
     font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
-  background-color: rebeccapurple;
 }
 
 .border-custom {
   border-width: 1.24px;
 }
-
-
-
 
 .gradient-text {
   background: linear-gradient(145.55deg, #ECECEC 20.35%, rgba(236, 236, 236, 0) 128.73%);
@@ -28,4 +24,10 @@
   -webkit-text-fill-color: transparent;
 }
 
+.faqHeader {
+  width: 706px;
+  height: 64px;
+  font-family: "Montserrat", sans-serif;
+  gap: 8px;
+}
 
