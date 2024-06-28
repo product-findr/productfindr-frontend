@@ -5181,7 +5181,7 @@ viem@^2.13.8:
 
 view@^1.1.1:
   version "1.1.1"
-  resolved "https://registry.npmjs.org/view/-/view-1.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/view/-/view-1.1.1.tgz#091f50ddc86c4113d003a61876fd5a8c926a1b86"
   integrity sha512-0YVWKnA5ivXxJnPUA21w67pBL45Lyj0H2rt7letkxnfFuf41OKyg5UViuXiZwfUmIFSkOEvi0p7XaOyaFcrBKw==
   dependencies:
     cheerio "0.19.x"

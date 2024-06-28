@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import TimerIcon from "../../app/assets/timer-icon.png";
-import { useWriteContract } from "wagmi";
+import { useSendTransaction, useWriteContract } from "wagmi";
+import { parseEther } from "viem";
 import { publicClient } from "@/config/client";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
+import { usdToETH } from "@/utils/utils";
 
 const BetaForm = () => {
   const [formData, setFormData] = useState({
@@ -30,19 +32,25 @@ const BetaForm = () => {
 
   const { writeContractAsync } = useWriteContract();
 
+  const { data: hash, sendTransaction } = useSendTransaction();
+
   const handlePayWithStripe = () => {
     // Handle Stripe payment logic here
     alert(`Payment with Stripe confirmed for ${selectedPackage.name} package!`);
   };
 
-  const handlePayWithSmartWallet = () => {
-    // Handle Smart Wallet payment logic here
-    alert(
-      `Payment with Smart Wallet confirmed for ${selectedPackage.name} package!`
-    );
+  const handlePayWithSmartWallet = (amount) => {
+    console.log(`handlePayWithSmartWallet called with: ${amount}`);
+    // const amountInETH = usdToETH(amount);
+    // console.log("amount in eth: " , amountInETH);
+    sendTransaction({
+      to: "0x3dAeC2cBC6f7272a30969AADEe406E2Eb9435D5f",
+      value: parseEther(amount),
+    });
   };
 
   const payModalPage = (name, amount) => () => {
+    console.log(`payModalPage called with: ${name}, ${amount}`);
     setSelectedPlan({ name, amount });
     if (step === 2) {
       setStep(3);
@@ -739,7 +747,7 @@ const BetaForm = () => {
                           </li>
                         </ul>
                         <button
-                          onClick={payModalPage("Pro Growth Package", "500")}
+                          onClick={() => payModalPage("Pro Growth Package", "500")()}
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                         >
                           Choose this plan
@@ -830,10 +838,9 @@ const BetaForm = () => {
                           </li>
                         </ul>
                         <button
-                          onClick={payModalPage(
-                            "Premium Launch Package",
-                            "1000"
-                          )}
+                          onClick={() =>
+                            payModalPage("Premium Launch Package", "1000")()
+                          }
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                         >
                           Choose this plan
@@ -868,7 +875,10 @@ const BetaForm = () => {
                   Pay with Stripe
                 </button>
                 <span className="text-[#9B30FF] mb-3">or</span>
-                <button className="text-[#9B30FF] bg-white font-bold text-lg px-8 py-4 mb-3 rounded-lg">
+                <button
+                  onClick={() => handlePayWithSmartWallet(selectedPlan.amount)}
+                  className="text-[#9B30FF] bg-white font-bold text-lg px-8 py-4 mb-3 rounded-lg"
+                >
                   Pay with coinbase
                 </button>
               </div>

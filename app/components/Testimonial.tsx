@@ -1,14 +1,36 @@
 import React from "react";
+import Image from "next/image";
+import Quote from "../assets/icons/quote.png";
 
 const Testimonial: React.FC = () => {
   return (
     <div className="sm:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-left mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#282828]">
-            Productfind<span className="text-[#9B30FF]">R</span> Testimonials
-          </h2>
-        </div>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#1E1E1E] mb-8">
+          Productfind<span className="text-[#9B30FF]">R</span> Testimonials
+        </h2>
+
+        <span className="block mb-12">
+          <div className="grid grid-cols-4 gap-4 items-center p-8">
+            <div className="col-span-1">
+              <Image
+                src={Quote}
+                alt="Description of image"
+                className="w-16 h-16"
+              />
+            </div>
+            <div className="col-span-2">
+            <p className="text-xl font-light">
+                “Before ProductfindR, dApp testing was a guessing game. Now,
+                their secure platform connects us with expert testers. We get
+                transparent feedback, fix bugs early, and launch with
+                confidence.”
+              </p>
+            </div>
+            <div className="col-span-1">
+            </div>
+          </div>
+        </span>
 
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <div className="bg-white shadow-lg p-4 rounded-2xl flex flex-col h-full">
