@@ -60,7 +60,7 @@ const LaunchForm = () => {
     if (typeof value === "string") {
       if (value.trim() === "") {
         error = `${name.replace(/([A-Z])/g, " $1").toLowerCase()} is required.`;
-      } else if (name === "description" && value.split(/\s+/).length < 200) {
+      } else if (name === "description" && value.split(/\s+/).length < 100) {
         error = "Description must be at least 200 words.";
       } else if (
         name === "twitterLink" &&
@@ -473,7 +473,7 @@ const LaunchForm = () => {
                 placeholder="Enter product description"
               />
               <span className="font-semibold flex justify-end mt-2 sm:text-xs md:text-base">
-                Minimum of 200 words{" "}
+                Minimum of 100 words{" "}
               </span>{" "}
               {errors.description && (
                 <p className="text-red-500 text-xs md:text-sm">

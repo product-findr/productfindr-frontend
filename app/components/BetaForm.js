@@ -4,14 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import TimerIcon from "../../app/assets/timer-icon.png";
 import { useWriteContract } from "wagmi";
+import { publicClient } from "@/config/client";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
-import { ProductfindrAddress } from "@/constant/constant";
-import { ProductfindrABI } from "@/constant/constant";
+import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
 
 const BetaForm = () => {
   const [formData, setFormData] = useState({
     productName: "",
+    contractAddress: "",
     targetNumberOfTesters: "",
     testingGoal: "",
     loomLink: "",
@@ -25,7 +26,29 @@ const BetaForm = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [selectedPlan, setSelectedPlan] = useState({ name: "", amount: "" });
+
   const { writeContractAsync } = useWriteContract();
+
+  const handlePayWithStripe = () => {
+    // Handle Stripe payment logic here
+    alert(`Payment with Stripe confirmed for ${selectedPackage.name} package!`);
+  };
+
+  const handlePayWithSmartWallet = () => {
+    // Handle Smart Wallet payment logic here
+    alert(
+      `Payment with Smart Wallet confirmed for ${selectedPackage.name} package!`
+    );
+  };
+
+  const payModalPage = (name, amount) => () => {
+    setSelectedPlan({ name, amount });
+    if (step === 2) {
+      setStep(3);
+    }
+  };
+
   const validateField = (name, value) => {
     let error = "";
 
@@ -59,6 +82,25 @@ const BetaForm = () => {
       ...prevErrors,
       [name]: error,
     }));
+
+    return error;
+  };
+
+  const validateContractAddress = async () => {
+    try {
+      const bytecode = await publicClient.getBytecode({
+        address: formData.contractAddress,
+      });
+
+      if (!bytecode) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      console.error("Byte Code Error: ", error);
+      return false;
+    }
   };
 
   const handleCheckboxChange = (event) => {
@@ -86,26 +128,71 @@ const BetaForm = () => {
     });
   };
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
 
     const betaTestingFields = [
       "productName",
+      "contractAddress",
       "targetNumberOfTesters",
       "testingGoal",
       "loomLink",
-      "goals",
       "startingDate",
       "endingDate",
     ];
 
     let valid = true;
-    betaTestingFields.forEach((field) => {
-      const error = validateField(field, formData[field] || "");
-      if (error) valid = false;
-    });
 
-    if (valid) setStep(2);
+    for (const field of betaTestingFields) {
+      const error = validateField(field, formData[field] || "");
+      if (error) {
+        valid = false;
+        console.log(`Field '${field}' validation failed: ${error}`);
+        setErrors((prev) => ({
+          ...prev,
+          [field]: error,
+        }));
+      }
+    }
+
+    // Validate goals
+    if (formData.goals.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        goals: "At least one goal must be selected.",
+      }));
+      valid = false;
+      console.log("No goals selected.");
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        goals: "",
+      }));
+    }
+
+    try {
+      const isValidContractAddress = await validateContractAddress(
+        formData.contractAddress
+      );
+      if (!isValidContractAddress) {
+        valid = false;
+        setErrors((prev) => ({
+          ...prev,
+          contractAddress: "Must be a base sepolia contract",
+        }));
+      }
+    } catch (error) {
+      valid = false;
+      setErrors((prev) => ({
+        ...prev,
+        contractAddress: "Error validating contract address.",
+      }));
+    }
+
+    // Proceed to next step if all validations passed
+    if (valid) {
+      setStep(2);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -131,7 +218,7 @@ const BetaForm = () => {
       const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
       });
-      console.log(transactionReceipt.status);
+
       if (transactionReceipt.status === "success") {
         setSuccess(true);
         setLoading(false);
@@ -153,7 +240,7 @@ const BetaForm = () => {
         </h2>{" "}
         <form
           className="space-y-4 p-4"
-          onSubmit={step < 2 ? handleNext : handleSubmit}
+          onSubmit={step < 3 ? handleNext : handleSubmit}
         >
           {step === 1 && (
             <>
@@ -179,6 +266,32 @@ const BetaForm = () => {
                   <p className="text-red-500 text-xs md:text-sm">
                     {" "}
                     {errors.productName}{" "}
+                  </p>
+                )}{" "}
+              </div>{" "}
+              <br />
+              <div>
+                <label
+                  htmlFor="contractAddress"
+                  className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
+                >
+                  Contract address of product{" "}
+                  <span className="text-[#9B30FF] pl-2"> * </span>{" "}
+                </label>{" "}
+                <input
+                  type="text"
+                  id="contractAddress"
+                  name="contractAddress"
+                  required
+                  className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
+                  placeholder="Copy the CA of the product"
+                  value={formData.contractAddress}
+                  onChange={handleChange}
+                />{" "}
+                {errors.contractAddress && (
+                  <p className="text-red-500 text-xs md:text-sm">
+                    {" "}
+                    {errors.contractAddress}{" "}
                   </p>
                 )}{" "}
               </div>{" "}
@@ -273,7 +386,7 @@ const BetaForm = () => {
                 </label>{" "}
                 <p className="text-sm text-gray-500 mb-4">
                   Check the goals you would like the testers to perform{" "}
-                </p>
+                </p>{" "}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center space-x-2">
                     <input
@@ -286,7 +399,7 @@ const BetaForm = () => {
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal1"> Usability test </label>{" "}
-                  </div>
+                  </div>{" "}
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -298,7 +411,7 @@ const BetaForm = () => {
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal2"> Bug reporting </label>{" "}
-                  </div>
+                  </div>{" "}
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -310,7 +423,7 @@ const BetaForm = () => {
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal3"> User interface </label>{" "}
-                  </div>
+                  </div>{" "}
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -322,7 +435,7 @@ const BetaForm = () => {
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal4"> User experience </label>{" "}
-                  </div>
+                  </div>{" "}
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -334,7 +447,7 @@ const BetaForm = () => {
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal5"> Feature feedback </label>{" "}
-                  </div>
+                  </div>{" "}
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -407,15 +520,16 @@ const BetaForm = () => {
           )}{" "}
           {step === 2 && (
             <>
+              {" "}
               {success === true ? (
                 <>
                   <div class="text-center">
                     <h2 class="text-[#9B30FF] text-3xl font-bold mb-6">
-                      Congratulations 🎉
-                    </h2>
-                    <p class="text-lg">
-                      {formData.productName} have successfully applied for beta
-                      tesing program
+                      Congratulations🎉{" "}
+                    </h2>{" "}
+                    <p className="text-lg">
+                      {formData.productName}&nbsp;have successfully applied for
+                      beta testing program
                     </p>
                     <Image
                       src={TimerIcon}
@@ -424,16 +538,15 @@ const BetaForm = () => {
                       width={400}
                       height={300}
                     />
-
                     <div class="mt-6 flex justify-center space-x-4">
                       <Link
                         href="/"
                         className="bg-white border-[1px] border-[#9B30FF] text-[#9B30FF] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2"
                       >
-                        Go Home
-                      </Link>
-                    </div>
-                  </div>
+                        Go Home{" "}
+                      </Link>{" "}
+                    </div>{" "}
+                  </div>{" "}
                 </>
               ) : (
                 <>
@@ -451,11 +564,11 @@ const BetaForm = () => {
                             {" "}
                             $0{" "}
                           </span>{" "}
-                        </div>
+                        </div>{" "}
                         <p className="font-light text-[#282828] sm:text-lg mb-6">
                           Perfect for testing basic concepts or prototypes.{" "}
-                        </p>
-                        <div className="border-t border-[#9B30FF80]"> </div>
+                        </p>{" "}
+                        <div className="border-t border-[#9B30FF80]"> </div>{" "}
                         <ul
                           role="list"
                           className="mb-8 space-y-4 text-left mt-6"
@@ -540,196 +653,227 @@ const BetaForm = () => {
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                           onClick={handleSubmit}
                         >
-                          {loading ? "choosing..." : "Choose this plan"}
-                        </a>{" "}
-                      </div>
-                      <div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-[#9B30FF] xl:p-8">
-                        <h3 className="mb-4 text-2xl text-[#9B30FF] font-semibold">
-                          Pro Growth{" "}
-                        </h3>{" "}
-                        <div className="flex justify-center items-baseline my-4">
-                          <span className="mr-2 text-5xl font-extrabold">
-                            {" "}
-                            $500{" "}
-                          </span>{" "}
-                        </div>{" "}
-                        <p className="font-light text-[#282828] sm:text-lg mb-6">
-                          Ideal for gathering in -depth feedback for early -
-                          stage products.{" "}
-                        </p>
-                        <div className="border-t border-[#9B30FF80]"> </div>
-                        <ul
-                          role="list"
-                          className="mb-8 space-y-4 text-left mt-6"
-                        >
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span> Up to 50 beta testers </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span> Detailed feedback reports </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span>
-                              Targeted tester demographics selection based on
-                              basic criteria(age, interests){" "}
-                            </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span> Priority customer support </span>{" "}
-                          </li>{" "}
-                        </ul>
-                        <a
-                          href="#"
-                          className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
-                        >
-                          Choose this plan{" "}
-                        </a>{" "}
-                      </div>
-                      <div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-[#9B30FF] xl:p-8">
-                        <h3 className="mb-4 text-2xl text-[#9B30FF] font-semibold">
-                          Premuim Launch{" "}
-                        </h3>{" "}
-                        <div className="flex justify-center items-baseline my-8">
-                          <span className="mr-2 text-5xl font-extrabold">
-                            $1000{" "}
-                          </span>{" "}
-                        </div>
-                        <p className="font-light text-[#282828] sm:text-lg mb-6">
-                          Designed for comprehensive pre - launch testing and
-                          targeted audience insights.{" "}
-                        </p>
-                        <div className="border-t border-[#9B30FF80]"> </div>
-                        <ul
-                          role="list"
-                          className="mb-8 space-y-4 text-left mt-6"
-                        >
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span> 100 + beta testers </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span>
-                              Advanced tester demographics selection(eg.income
-                              level, tech savviness){" "}
-                            </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span> In - depth feedback analysis </span>{" "}
-                          </li>{" "}
-                          <li className="flex items-center space-x-3">
-                            <svg
-                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
-                              fill="#9B30FF"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              ></path>{" "}
-                            </svg>{" "}
-                            <span>
-                              Dedicated account manager for personalized support{" "}
-                            </span>{" "}
-                          </li>{" "}
-                        </ul>{" "}
-                        <a
-                          href="#"
-                          className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
-                        >
-                          Choose this plan{" "}
+                          {loading ? "choosing..." : "Choose this plan"}{" "}
                         </a>{" "}
                       </div>{" "}
-                    </div>{" "}
+                      <div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-[#9B30FF] xl:p-8">
+                        <h3 className="mb-4 text-2xl text-[#9B30FF] font-semibold">
+                          Pro Growth
+                        </h3>
+                        <div className="flex justify-center items-baseline my-4">
+                          <span className="mr-2 text-5xl font-extrabold">
+                            $500
+                          </span>
+                        </div>
+                        <p className="font-light text-[#282828] sm:text-lg mb-6">
+                          Ideal for gathering in-depth feedback for early-stage
+                          products.
+                        </p>
+                        <div className="border-t border-[#9B30FF80]"></div>
+                        <ul
+                          role="list"
+                          className="mb-8 space-y-4 text-left mt-6"
+                        >
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>Up to 50 beta testers</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>Detailed feedback reports</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>
+                              Targeted tester demographics selection based on
+                              basic criteria (age, interests)
+                            </span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>Priority customer support</span>
+                          </li>
+                        </ul>
+                        <button
+                          onClick={payModalPage("Pro Growth Package", "500")}
+                          className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
+                        >
+                          Choose this plan
+                        </button>
+                      </div>
+                      <div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-[#9B30FF] xl:p-8">
+                        <h3 className="mb-4 text-2xl text-[#9B30FF] font-semibold">
+                          Premium Launch
+                        </h3>
+                        <div className="flex justify-center items-baseline my-8">
+                          <span className="mr-2 text-5xl font-extrabold">
+                            $1000
+                          </span>
+                        </div>
+                        <p className="font-light text-[#282828] sm:text-lg mb-6">
+                          Designed for comprehensive pre-launch testing and
+                          targeted audience insights.
+                        </p>
+                        <div className="border-t border-[#9B30FF80]"></div>
+                        <ul
+                          role="list"
+                          className="mb-8 space-y-4 text-left mt-6"
+                        >
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>100+ beta testers</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>
+                              Advanced tester demographics selection (e.g.,
+                              income level, tech savviness)
+                            </span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>In-depth feedback analysis</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+                              fill="#9B30FF"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            <span>
+                              Dedicated account manager for personalized support
+                            </span>
+                          </li>
+                        </ul>
+                        <button
+                          onClick={payModalPage(
+                            "Premium Launch Package",
+                            "1000"
+                          )}
+                          className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
+                        >
+                          Choose this plan
+                        </button>
+                      </div>
+                    </div>
                   </section>{" "}
                 </>
-              )}
+              )}{" "}
             </>
           )}{" "}
+          {step === 3 && (
+            <>
+              <div className="text-lg font-semibold mb-4 text-center">
+                You have selected
+              </div>
+              <h2 className="text-3xl font-bold mb-6 text-center py-6">
+                {selectedPlan.name}
+              </h2>
+              <div className="flex flex-col items-center">
+                <button className="text-white bg-[#9B30FF] border border-[#9B30FF] font-medium rounded-lg text-sm px-8 sm:px-16 py-2 sm:py-4 mb-3">
+                  Price{" "}
+                  <span className="text-lg font-bold">
+                    {" "}
+                    ${selectedPlan.amount}
+                  </span>
+                </button>
+
+                <div className="border-t border-[#9B30FF] w-full my-8"></div>
+
+                <button className="text-[#9B30FF] bg-black text-white font-bold text-lg px-8 py-4 mb-3 rounded-lg">
+                  Pay with Stripe
+                </button>
+                <span className="text-[#9B30FF] mb-3">or</span>
+                <button className="text-[#9B30FF] bg-white font-bold text-lg px-8 py-4 mb-3 rounded-lg">
+                  Pay with coinbase
+                </button>
+              </div>
+            </>
+          )}
         </form>{" "}
       </div>{" "}
     </>

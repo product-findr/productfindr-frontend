@@ -18,7 +18,7 @@ const FAQ = () => {
       answer: "what are the benefits for beta testers?",
     },
     {
-      question: "what are the benefits for product owners o Productfindr?",
+      question: "what are the benefits for product owners on Productfindr?",
       answer: "what are the benefits for product owners?",
     },
     {

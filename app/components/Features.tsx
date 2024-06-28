@@ -52,7 +52,7 @@ const Features: React.FC = () => {
               className="mb-4"
             />
             <p className="font-bold text-xl sm:text-2xl md:text-3xl text-[#282828] text-center">
-              On Chain
+              OnChain
             </p>
             <p className="font-bold text-xl sm:text-2xl md:text-3xl text-[#282828] text-center">
               Activities
@@ -68,9 +68,6 @@ const Features: React.FC = () => {
             />
             <p className="font-bold text-xl sm:text-2xl md:text-3xl text-[#282828] text-center">
               Earn while Beta-testing
-            </p>
-            <p className="font-bold text-xl sm:text-2xl md:text-3xl text-[#282828] text-center">
-              Beta-testing
             </p>
           </div>
           <div className="bg-white shadow-lg p-4 rounded-2xl flex items-center justify-center flex-col">
