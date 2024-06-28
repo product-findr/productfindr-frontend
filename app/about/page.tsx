@@ -30,8 +30,9 @@ const Page = () => {
       </div>
       <div className="container mx-auto mt-12">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#1E1E1E] mb-8">
-          What's our Mission
+          What&apos;s our Mission
         </h2>
+
         <span className="block">
           <div className="grid grid-cols-4 gap-4 items-center p-8">
             <div className="col-span-1">
