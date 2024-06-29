@@ -1,6 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import TeamMember1 from "../assets/teams/idris.jpeg";
+import TeamMember2 from "../assets/teams/israel.jpg";
+import TeamMember3 from "../assets/teams/damilare.jpg";
+import TeamMember4 from "../assets/teams/Mame.jpeg"
 import Quote from "../assets/icons/quote.png";
 import Navbar from "../components/Navbar";
 import Launch from "../components/Launch";
@@ -98,7 +102,7 @@ const Page = () => {
           {/* Team Member 1 */}
           <div className="w-full md:w-1/4 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
+              <Image src={TeamMember1} alt="Idris" className="rounded-md mb-6" />
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-4">Idris Olubisi</h3>
                 <p className="text-gray-600">Blockchain Developer</p>
@@ -117,7 +121,7 @@ const Page = () => {
           {/* Team Member 2 */}
           <div className="w-full md:w-1/4 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
+            <Image src={TeamMember2} alt="Idris" className="rounded-md mb-2" />
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-4">Ogedengbe Israel</h3>
                 <p className="text-gray-600">Frontend Developer</p>
@@ -136,7 +140,7 @@ const Page = () => {
           {/* Team Member 3 */}
           <div className="w-full md:w-1/4 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
+            <Image src={TeamMember3} alt="Idris" className="rounded-md mb-6" />
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-4">
                   Damilare Aregbesola
@@ -157,7 +161,7 @@ const Page = () => {
           {/* Team Member 4 */}
           <div className="w-full md:w-1/4 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
+            <Image src={TeamMember4} alt="Idris" className="rounded-md mb-2" />
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-4">Omomame Imafidon</h3>
                 <p className="text-gray-600">Product Designer</p>

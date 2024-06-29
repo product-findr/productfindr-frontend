@@ -39,13 +39,13 @@ const BetaForm = () => {
     alert(`Payment with Stripe confirmed for ${selectedPackage.name} package!`);
   };
 
-  const handlePayWithSmartWallet = (amount) => {
+  const handlePayWithSmartWallet = async (amount) => {
     console.log(`handlePayWithSmartWallet called with: ${amount}`);
-    // const amountInETH = usdToETH(amount);
-    // console.log("amount in eth: " , amountInETH);
+    const usdToSend = await usdToETH(amount);
+    console.log("amount in eth: ", usdToSend);
     sendTransaction({
       to: "0x3dAeC2cBC6f7272a30969AADEe406E2Eb9435D5f",
-      value: parseEther(amount),
+      value: parseEther(1),
     });
   };
 
@@ -747,7 +747,9 @@ const BetaForm = () => {
                           </li>
                         </ul>
                         <button
-                          onClick={() => payModalPage("Pro Growth Package", "500")()}
+                          onClick={() =>
+                            payModalPage("Pro Growth Package", "500")()
+                          }
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                         >
                           Choose this plan

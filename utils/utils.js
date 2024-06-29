@@ -40,7 +40,7 @@ export async function usdToETH(amountInUSD) {
     // extracts the USD price from the data
     const ethPrice = data.ethereum.usd;
     // converts the USD amount to ETH by dividing the amount by the current ETH price
-    const ethAmount = (amountInUSD / ethPrice).toFixed(6); // Adjust the decimal places as needed
+    const ethAmount = (amountInUSD / ethPrice).toFixed(4); // Adjust the decimal places as needed
     return ethAmount;
   } catch (error) {
     console.error("Error fetching USD to ETH conversion:", error);
