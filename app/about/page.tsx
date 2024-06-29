@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import TeamMember1 from "../assets/teams/idris.jpeg";
+
 import TeamMember2 from "../assets/teams/israel.jpg";
 import TeamMember3 from "../assets/teams/damilare.jpg";
 import TeamMember4 from "../assets/teams/Mame.jpeg"
@@ -102,7 +102,7 @@ const Page = () => {
           {/* Team Member 1 */}
           <div className="w-full md:w-1/4 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <Image src={TeamMember1} alt="Idris" className="rounded-md mb-6" />
+              <Image src={TeamMember3} alt="Idris" className="rounded-md mb-6" />
               <div className="mb-4">
                 <h3 className="text-xl font-semibold mb-4">Idris Olubisi</h3>
                 <p className="text-gray-600">Blockchain Developer</p>

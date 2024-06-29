@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import TimerIcon from "../assets/timer-icon.png";
-import { useWriteContract } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import Image from "next/image";
 import { ProductfindrAddress } from "../../constant/constant";
 import { ProductfindrABI } from "../../constant/constant";
 import Link from "next/link";
+import { StackClient } from "@stackso/js-core";
 
 const LaunchForm = () => {
   const [formData, setFormData] = useState({
@@ -45,6 +46,15 @@ const LaunchForm = () => {
 
   const { writeContractAsync } = useWriteContract();
 
+  const account = useAccount().address;
+
+  const stack = new StackClient({
+    // Load the API key and point system ID from environment variables
+    apiKey: "aef41135-388d-4e96-af4b-24039c7ca4ee",
+    pointSystemId: "2773",
+  });
+  
+
   const isValidUrl = (urlString) => {
     try {
       new URL(urlString);
@@ -61,7 +71,7 @@ const LaunchForm = () => {
       if (value.trim() === "") {
         error = `${name.replace(/([A-Z])/g, " $1").toLowerCase()} is required.`;
       } else if (name === "description" && value.split(/\s+/).length < 100) {
-        error = "Description must be at least 200 words.";
+        error = "Description must be at least 100 words.";
       } else if (
         name === "twitterLink" &&
         !(
@@ -260,6 +270,11 @@ const LaunchForm = () => {
       return;
     }
 
+    await stack.track("signup", {
+      points: 15,
+      account: "0x9294c1398e77829df211d4dfe8208ada0bfb6f85",
+    });
+
     const param = [
       formData.productName,
       formData.tagLine,
@@ -286,7 +301,6 @@ const LaunchForm = () => {
       const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
       });
-      console.log(transactionReceipt.status);
 
       if (transactionReceipt.status === "success") {
         setSuccess(true);
