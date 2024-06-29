@@ -9,6 +9,7 @@ import Image from "next/image";
 import { ProductfindrAddress } from "../../constant/constant";
 import { ProductfindrABI } from "../../constant/constant";
 import Link from "next/link";
+import stack from "@/stacks/stacks";
 
 const LaunchForm = () => {
   const [formData, setFormData] = useState({
@@ -44,6 +45,7 @@ const LaunchForm = () => {
   const [success, setSuccess] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
+  
 
   const isValidUrl = (urlString) => {
     try {
@@ -61,7 +63,7 @@ const LaunchForm = () => {
       if (value.trim() === "") {
         error = `${name.replace(/([A-Z])/g, " $1").toLowerCase()} is required.`;
       } else if (name === "description" && value.split(/\s+/).length < 100) {
-        error = "Description must be at least 200 words.";
+        error = "Description must be at least 100 words.";
       } else if (
         name === "twitterLink" &&
         !(
@@ -227,6 +229,19 @@ const LaunchForm = () => {
     if (valid3) setStep(4);
   };
 
+  const stackTest = async () => {
+    await stack.track("signup", {
+      points: 10,
+      account: "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"
+    });
+    
+    await stack.track("signup", {
+      points: 15,
+      account: "0x2eeb301387D6BDa23E02fa0c7463507c68b597B5",
+    });
+   // console.log("Balance: ", balance);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLaunch(true);
@@ -286,7 +301,6 @@ const LaunchForm = () => {
       const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
       });
-      console.log(transactionReceipt.status);
 
       if (transactionReceipt.status === "success") {
         setSuccess(true);
@@ -307,6 +321,7 @@ const LaunchForm = () => {
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
       </h2>
+      <button className="border border-[red]" onClick={stackTest}>Stack</button>
       <form
         onSubmit={step < 4 ? handleNext : handleSubmit}
         className="space-y-4 p-4"
