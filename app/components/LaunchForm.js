@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import TimerIcon from "../assets/timer-icon.png";
-import { useAccount, useWriteContract } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import Image from "next/image";
 import { ProductfindrAddress } from "../../constant/constant";
 import { ProductfindrABI } from "../../constant/constant";
 import Link from "next/link";
-import { StackClient } from "@stackso/js-core";
+import stack from "@/stacks/stacks";
 
 const LaunchForm = () => {
   const [formData, setFormData] = useState({
@@ -45,14 +45,6 @@ const LaunchForm = () => {
   const [success, setSuccess] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
-
-  const account = useAccount().address;
-
-  const stack = new StackClient({
-    // Load the API key and point system ID from environment variables
-    apiKey: "aef41135-388d-4e96-af4b-24039c7ca4ee",
-    pointSystemId: "2773",
-  });
   
 
   const isValidUrl = (urlString) => {
@@ -237,6 +229,19 @@ const LaunchForm = () => {
     if (valid3) setStep(4);
   };
 
+  const stackTest = async () => {
+    await stack.track("signup", {
+      points: 10,
+      account: "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"
+    });
+    
+    await stack.track("signup", {
+      points: 15,
+      account: "0x2eeb301387D6BDa23E02fa0c7463507c68b597B5",
+    });
+   // console.log("Balance: ", balance);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLaunch(true);
@@ -269,11 +274,6 @@ const LaunchForm = () => {
       alert("Please fill out all required fields correctly.");
       return;
     }
-
-    await stack.track("signup", {
-      points: 15,
-      account: "0x9294c1398e77829df211d4dfe8208ada0bfb6f85",
-    });
 
     const param = [
       formData.productName,
@@ -321,6 +321,7 @@ const LaunchForm = () => {
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
       </h2>
+      <button className="border border-[red]" onClick={stackTest}>Stack</button>
       <form
         onSubmit={step < 4 ? handleNext : handleSubmit}
         className="space-y-4 p-4"
