@@ -4,6 +4,7 @@ import HeroSection from "./components/HeroSection";
 import HeroImagePage from "./components/HeroImage";
 import Techstack from "./components/Techstack";
 import Features from "./components/Features";
+import Steps from "./components/Steps";
 import Testimonial from "./components/Testimonial";
 import FAQ from "./components/FAQ";
 import Earning from "./components/Earning";
@@ -20,6 +21,7 @@ export default function Page() {
     </div>
     <Techstack />
     <Features />
+    <Steps />
     <Testimonial />
     <FAQ />
     <Earning />
