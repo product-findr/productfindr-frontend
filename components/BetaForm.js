@@ -38,9 +38,16 @@ const BetaForm = () => {
   const account = useAccount();
   const connectionStatus = account.status;
 
-  const handlePayWithStripe = () => {
-    // Handle Stripe payment logic here
-    alert(`Payment with Stripe confirmed for ${selectedPackage.name} package!`);
+  const handlePayWithStripe = (amount) => {
+    let url = "";
+
+    if (amount === "1000") {
+      url = "https://buy.stripe.com/test_aEUaHF3Vi6b30hObII";
+    } else {
+      url = "https://buy.stripe.com/test_8wM5nlbnK6b32pW5kl";
+    }
+
+    window.location.href = url;
   };
 
   const handlePayWithSmartWallet = async (amount) => {
@@ -705,7 +712,7 @@ const BetaForm = () => {
                         </h3>
                         <div className="flex justify-center items-baseline my-4">
                           <span className="mr-2 text-5xl font-extrabold">
-                            $500
+                            $1000
                           </span>
                         </div>
                         <p className="font-light text-[#282828] sm:text-lg mb-6">
@@ -783,7 +790,7 @@ const BetaForm = () => {
                         </ul>
                         <button
                           onClick={() =>
-                            payModalPage("Pro Growth Package", "500")()
+                            payModalPage("Pro Growth Package", "1000")()
                           }
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                         >
@@ -796,7 +803,7 @@ const BetaForm = () => {
                         </h3>
                         <div className="flex justify-center items-baseline my-8">
                           <span className="mr-2 text-5xl font-extrabold">
-                            $1000
+                            $5000
                           </span>
                         </div>
                         <p className="font-light text-[#282828] sm:text-lg mb-6">
@@ -876,7 +883,7 @@ const BetaForm = () => {
                         </ul>
                         <button
                           onClick={() =>
-                            payModalPage("Premium Launch Package", "1000")()
+                            payModalPage("Premium Launch Package", "5000")()
                           }
                           className="text-[#9B30FF] bg-transparent border border-[#9B30FF] font-medium rounded-full text-sm px-5 py-3 text-center w-full max-w-xs md:max-w-sm lg:max-w-md block mx-auto"
                         >
@@ -908,7 +915,10 @@ const BetaForm = () => {
 
                 <div className="border-t border-[#9B30FF] w-full my-8"></div>
 
-                <button className="text-[#9B30FF] bg-black text-white font-bold text-lg px-8 py-4 mb-3 rounded-lg">
+                <button
+                  onClick={() => handlePayWithStripe(selectedPlan.amount)}
+                  className="text-[#9B30FF] bg-black text-white font-bold text-lg px-8 py-4 mb-3 rounded-lg"
+                >
                   Pay with Stripe
                 </button>
                 <span className="text-[#9B30FF] mb-3">or</span>
