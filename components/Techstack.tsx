@@ -1,14 +1,11 @@
 import React from "react";
 import Image from "next/image";
 
-{
-  /* Logo Importing */
-}
-import coinbase from "../assets/logo/coinbase.png";
-import stripe from "../assets/logo/stripe.png";
-import fleek from "../assets/logo/fleek.png";
-import base from "../assets/logo/base.png";
-import xmtp from "../assets/logo/xmtp.png";
+import coinbase from "../app/assets/logo/coinbase.png";
+import stripe from "../app/assets/logo/stripe.png";
+import fleek from "../app/assets/logo/fleek.png";
+import base from "../app/assets/logo/base.png";
+import xmtp from "../app/assets/logo/xmtp.png";
 
 const Techstack: React.FC = () => {
   return (

@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import ProductfindrLogo from "../assets/productfindr.png"; 
+import ProductfindrLogo from "../app/assets/productfindr.png"; 
 
 const Footer: React.FC = () => {
   return (

@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { truncateAddress } from "../../utils/utils";
+import { truncateAddress } from "../utils/utils";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import Logo from "../assets/productfindr-black.png";
-import WalletIcon from "../assets/icons/wallet.png";
+import Logo from "../app/assets/productfindr-black.png";
+import WalletIcon from "../app/assets/icons/wallet.png";
 import Link from "next/link";
 
 const ProductNavbar: React.FC = () => {
@@ -53,7 +53,7 @@ const ProductNavbar: React.FC = () => {
           </div>
           <div className="hidden md:flex space-x-6 items-center">
             <ul className="flex space-x-6">
-              <li className="group relative text-lg">
+              <li className="group relative text-base md:text-lg">
                 <Link
                   href="/product"
                   className={`${
@@ -63,18 +63,29 @@ const ProductNavbar: React.FC = () => {
                   }`}
                   aria-label="Go to Products"
                 >
-                  Products
+                  Discover products
                 </Link>
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
               </li>
-              <li className="group relative text-lg">
+              <li className="group relative text-base md:text-lg">
                 <Link
                   href="/launch"
                   className={`${
                     pathname === "/launch" ? "text-[#9B30FF]" : "text-[#282828]"
                   }`}
                 >
-                  Launch Product
+                  Launch
+                </Link>
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
+              </li>
+              <li className="group relative text-base md:text-lg">
+                <Link
+                  href="/beta-testing"
+                  className={`${
+                    pathname === "/beta-testing" ? "text-[#9B30FF]" : "text-[#282828]"
+                  }`}
+                >
+                  Beta
                 </Link>
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
               </li>
@@ -83,9 +94,9 @@ const ProductNavbar: React.FC = () => {
               {connectors.map((connector) =>
                 account.status === "connected" ? (
                   <button
-                    key={connector.uid}
+                    key={connector.id}
                     type="button"
-                    className="bg-[#ECECEC] border-[1px] border-[#9B30FF] text-[#0B081C] px-4 py-2 rounded-full text-lg flex items-center space-x-2"
+                    className="bg-[#ECECEC] border-[1px] border-[#9B30FF] text-[#0B081C] px-4 py-2 rounded-full text-base md:text-lg flex items-center space-x-2"
                     onClick={() => disconnect()}
                   >
                     <Image
@@ -97,9 +108,9 @@ const ProductNavbar: React.FC = () => {
                   </button>
                 ) : (
                   <button
-                    key={connector.uid}
+                    key={connector.id}
                     type="button"
-                    className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-full text-lg flex items-center space-x-2"
+                    className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-full text-base md:text-lg flex items-center space-x-2"
                     onClick={() => connect({ connector })}
                   >
                     <span>connect wallet</span>
@@ -133,14 +144,19 @@ const ProductNavbar: React.FC = () => {
         {isOpen && (
           <div className="md:hidden py-4 pl-4">
             <ul className="flex flex-col space-y-3">
-              <li className="text-lg mt-4">
+              <li className="text-base md:text-lg mt-4">
                 <a href="/product" className="text-[#282828]">
-                  Products
+                  Discover products
                 </a>
               </li>
-              <li className="text-lg">
+              <li className="text-base md:text-lg">
                 <a href="/launch" className="text-[#9B30FF]">
-                  Launch Product
+                  Launch
+                </a>
+              </li>
+              <li className="text-base md:text-lg">
+                <a href="/beta-testing" className="text-[#9B30FF]">
+                  Beta Testing
                 </a>
               </li>
             </ul>
@@ -148,9 +164,9 @@ const ProductNavbar: React.FC = () => {
               {connectors.map((connector) =>
                 account.status === "connected" ? (
                   <button
-                    key={connector.uid}
+                    key={connector.id}
                     type="button"
-                    className="bg-[#ECECEC] border-[1px] border-[#9B30FF] text-[#0B081C] px-4 py-2 rounded-md text-lg flex items-center mt-4 space-x-2"
+                    className="bg-[#ECECEC] border-[1px] border-[#9B30FF] text-[#0B081C] px-4 py-2 rounded-md text-base md:text-lg flex items-center mt-4 space-x-2"
                     onClick={() => disconnect()}
                   >
                     <Image
@@ -162,9 +178,9 @@ const ProductNavbar: React.FC = () => {
                   </button>
                 ) : (
                   <button
-                    key={connector.uid} // Added key for each button
+                    key={connector.id}
                     type="button"
-                    className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-md text-lg flex items-center mt-4 space-x-2"
+                    className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-md text-base md:text-lg flex items-center mt-4 space-x-2"
                     onClick={() => connect({ connector })}
                   >
                     <span>connect wallet</span>

@@ -2,14 +2,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import TimerIcon from "../../app/assets/timer-icon.png";
-import { useSendTransaction, useWriteContract } from "wagmi";
+import TimerIcon from "../app/assets/timer-icon.png";
+import { useSendTransaction, useWriteContract, useAccount } from "wagmi";
 import { parseEther } from "viem";
 import { publicClient } from "@/config/client";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
 import { usdToETH } from "@/utils/utils";
+import stack from "@/stacks/stacks";
 
 const BetaForm = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +34,8 @@ const BetaForm = () => {
   const { writeContractAsync } = useWriteContract();
 
   const { data: hash, sendTransaction } = useSendTransaction();
+
+  const account = useAccount();
 
   const handlePayWithStripe = () => {
     // Handle Stripe payment logic here
@@ -228,6 +231,12 @@ const BetaForm = () => {
       });
 
       if (transactionReceipt.status === "success") {
+        const addPoints = await stack.track("beta_testing", {
+          points: 20,
+          account: account.address,
+          uniqueId: account.address,
+        });
+        console.log("Add Points: ", addPoints.success === "true");
         setSuccess(true);
         setLoading(false);
       } else {

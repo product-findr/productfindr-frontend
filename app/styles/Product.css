@@ -8,11 +8,23 @@
     background-color: white;
 }
 
-/* ProductSidebar.css */
+
 .sidebar-button {
-  font-size: xx-small; /* Adjust the font size as needed */
-  margin-left: 1rem; /* Adjust the padding-left as needed */
+  font-size: xx-small; 
+  margin-left: 1rem; 
 }
+
+
+.spacious-text {
+  padding: 16px;
+  line-height: 1.8; 
+  margin-top: 16px;
+  font-size: 1.125rem;
+  color: #282828;
+  border-radius: 8px;
+}
+
+
 
 
 @media only screen and (max-width: 600px) {

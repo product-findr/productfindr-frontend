@@ -6,9 +6,9 @@ import TeamMember2 from "../assets/teams/israel.jpg";
 import TeamMember3 from "../assets/teams/damilare.jpg";
 import TeamMember4 from "../assets/teams/Mame.jpeg"
 import Quote from "../assets/icons/quote.png";
-import Navbar from "../components/Navbar";
-import Launch from "../components/Launch";
-import Footer from "../components/Footer";
+import Navbar from "../../components/Navbar";
+import Launch from "../../components/Launch";
+import Footer from "../../components/Footer";
 import "../styles/Product.css";
 
 const Page = () => {
