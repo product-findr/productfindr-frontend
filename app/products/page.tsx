@@ -15,7 +15,7 @@ const ProductPage: React.FC = () => {
             Welcome to Productfind<span className="text-[#9B30FF]">R</span> 🔎
           </h2>
           <p className="text-gray-600 mb-2">
-            "Search smarter, find better, earn BIGGER” 💸
+          &quot;Search smarter, find better, earn BIGGER&quot; 💸
           </p>
           <p className="text-gray-600">
             Get Started on making money while beta testing exclusive features
