@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import coinbase from "../app/assets/logo/coinbase.png";
 import stripe from "../app/assets/logo/stripe.png";
-import fleek from "../app/assets/logo/fleek.png";
+import graph from "../app/assets/logo/TheGraph.png";
 import base from "../app/assets/logo/base.png";
 import xmtp from "../app/assets/logo/xmtp.png";
 
@@ -22,8 +22,8 @@ const Techstack: React.FC = () => {
               <Image
                 src={coinbase}
                 alt="Coinbase Logo"
-                width={60}
-                height={20}
+                width={100}
+                height={50}
                 className="cursor-pointer"
               />
             </div>
@@ -31,17 +31,8 @@ const Techstack: React.FC = () => {
               <Image
                 src={stripe}
                 alt="Stripe Logo"
-                width={60}
-                height={20}
-                className="cursor-pointer"
-              />
-            </div>
-            <div className="flex justify-center items-center transition-transform duration-500 transform hover:-translate-x-2">
-              <Image
-                src={fleek}
-                alt="Fleek Logo"
-                width={60}
-                height={20}
+                width={100}
+                height={50}
                 className="cursor-pointer"
               />
             </div>
@@ -50,7 +41,16 @@ const Techstack: React.FC = () => {
                 src={base}
                 alt="Base Logo"
                 width={60}
-                height={20}
+                height={30}
+                className="cursor-pointer"
+              />
+            </div>
+            <div className="flex justify-center items-center transition-transform duration-500 transform hover:-translate-x-2">
+              <Image
+                src={graph}
+                alt="The Graph Logo"
+                width={100}
+                height={50}
                 className="cursor-pointer"
               />
             </div>
@@ -58,8 +58,8 @@ const Techstack: React.FC = () => {
               <Image
                 src={xmtp}
                 alt="XMTP Logo"
-                width={60}
-                height={20}
+                width={100}
+                height={50}
                 className="cursor-pointer"
               />
             </div>
