@@ -36,6 +36,7 @@ const BetaForm = () => {
   const { data: hash, sendTransaction } = useSendTransaction();
 
   const account = useAccount();
+  const connectionStatus = account.status;
 
   const handlePayWithStripe = () => {
     // Handle Stripe payment logic here
@@ -141,6 +142,15 @@ const BetaForm = () => {
 
   const handleNext = async (e) => {
     e.preventDefault();
+
+    if (connectionStatus !== "connected") {
+      setErrors((prev) => ({
+        ...prev,
+        connection: "Please connect your wallet to proceed.",
+      }));
+
+      return;
+    }
 
     const betaTestingFields = [
       "productName",
@@ -493,8 +503,8 @@ const BetaForm = () => {
                       className="block text-sm font-bold text-gray-700 mb-2"
                       htmlFor="startingDate"
                     >
-                      Starting date{" "}
-                    </label>{" "}
+                      Starting date
+                    </label>
                     <input
                       type="date"
                       id="startingDate"
@@ -503,15 +513,21 @@ const BetaForm = () => {
                       className="bg-transparent mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
                       value={formData.startingDate}
                       onChange={handleChange}
-                    />{" "}
-                  </div>{" "}
+                    />
+                    {errors.startingDate && (
+                      <p className="text-red-500 text-xs md:text-sm mt-1">
+                        {errors.startingDate}
+                      </p>
+                    )}
+                  </div>
+
                   <div className="flex-1">
                     <label
                       className="block text-sm font-bold text-gray-700 mb-2"
                       htmlFor="endingDate"
                     >
-                      Ending date{" "}
-                    </label>{" "}
+                      Ending date
+                    </label>
                     <input
                       type="date"
                       id="endingDate"
@@ -520,11 +536,21 @@ const BetaForm = () => {
                       className="bg-transparent mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
                       value={formData.endingDate}
                       onChange={handleChange}
-                    />{" "}
-                  </div>{" "}
-                </div>{" "}
+                    />
+                    {errors.endingDate && (
+                      <p className="text-red-500 text-xs md:text-sm mt-1">
+                        {errors.endingDate}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>{" "}
               <br />
+              {errors.connection && (
+                <p className="text-red-500 text-xs md:text-sm flex justify-end">
+                  {errors.connection}
+                </p>
+              )}
               <div className="flex justify-center pt-6">
                 <button
                   type="submit"

@@ -9,7 +9,7 @@ const Launch = () => {
       <ProductNavbar />
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <aside className="hidden md:block col-span-1 border border-[#9B30FF] rounded-xl p-4">
+          <aside className="hidden md:block col-span-1 rounded-xl p-4">
             <div className="flex flex-col items-center space-y-12 my-12">
               <button className="w-1/2 h-12 bg-gray-600 text-white rounded-lg my-1">
                 Main Info

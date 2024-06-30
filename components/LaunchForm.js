@@ -46,7 +46,7 @@ const LaunchForm = () => {
   const { writeContractAsync } = useWriteContract();
 
   const account = useAccount();
-  
+  const connectionStatus = account.status;
 
   const isValidUrl = (urlString) => {
     try {
@@ -196,6 +196,16 @@ const LaunchForm = () => {
 
   const handleNext = (e) => {
     e.preventDefault();
+
+    if (connectionStatus !== "connected") {
+      setErrors((prev) => ({
+        ...prev,
+        connection: "Please connect your wallet to proceed",
+      }));
+
+      return;
+    }
+
     // Validate all fields in part 1 before moving to part 2
     const part1Fields = [
       "productName",
@@ -516,6 +526,11 @@ const LaunchForm = () => {
                 </p>
               )}{" "}
             </div>{" "}
+            {errors.connection && (
+              <p className="text-red-500 text-xs md:text-sm flex justify-end">
+                {errors.connection}
+              </p>
+            )}
             <div className="text-right">
               <button
                 type="submit"
