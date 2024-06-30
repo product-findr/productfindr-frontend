@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import Quote from "../assets/icons/quote.png";
+import Quote from "../app/assets/icons/quote.png";
 
 const Testimonial: React.FC = () => {
   return (

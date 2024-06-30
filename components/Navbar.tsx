@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import Logo from "../assets/productfindr.png";
+import Logo from "../app/assets/productfindr.png";
 import Link from "next/link";
 
 const Navbar: React.FC = () => {

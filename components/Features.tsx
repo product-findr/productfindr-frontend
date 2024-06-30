@@ -2,10 +2,10 @@ import React from "react";
 import Image from "next/image";
 
 // Icons Importing
-import scan from "../assets/icons/scan.png";
-import security from "../assets/icons/security.png";
-import cash from "../assets/icons/cash.png";
-import rocket from "../assets/icons/rocket.png";
+import scan from "../app/assets/icons/scan.png";
+import security from "../app/assets/icons/security.png";
+import cash from "../app/assets/icons/cash.png";
+import rocket from "../app/assets/icons/rocket.png";
 
 const Features: React.FC = () => {
   return (

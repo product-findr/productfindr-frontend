@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import HeroImage from "../assets/productfindr-demo.png";
+import HeroImage from "../app/assets/productfindr-demo.png";
 
 const HeroImagePage: React.FC = () => {
   return (

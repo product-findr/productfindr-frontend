@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/Product.css";
+import "../app/styles/Product.css";
 
 const Steps = () => {
   return (

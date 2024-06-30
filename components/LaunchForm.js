@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import TimerIcon from "../assets/timer-icon.png";
-import { useWriteContract } from "wagmi";
+import TimerIcon from "../app/assets/timer-icon.png";
+import { useWriteContract, useAccount } from "wagmi";
 import { wagmiConfig } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import Image from "next/image";
-import { ProductfindrAddress } from "../../constant/constant";
-import { ProductfindrABI } from "../../constant/constant";
+import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
 import Link from "next/link";
 import stack from "@/stacks/stacks";
 
@@ -45,6 +44,8 @@ const LaunchForm = () => {
   const [success, setSuccess] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
+
+  const account = useAccount();
   
 
   const isValidUrl = (urlString) => {
@@ -229,19 +230,6 @@ const LaunchForm = () => {
     if (valid3) setStep(4);
   };
 
-  const stackTest = async () => {
-    await stack.track("signup", {
-      points: 10,
-      account: "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"
-    });
-    
-    await stack.track("signup", {
-      points: 15,
-      account: "0x2eeb301387D6BDa23E02fa0c7463507c68b597B5",
-    });
-   // console.log("Balance: ", balance);
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLaunch(true);
@@ -303,6 +291,12 @@ const LaunchForm = () => {
       });
 
       if (transactionReceipt.status === "success") {
+        const addPoints = await stack.track("product_launch", {
+          points: 10,
+          account: account.address,
+          uniqueId: account.address,
+        });
+        console.log("Add Points: ", addPoints.success === "true");
         setSuccess(true);
         setLaunch(false);
       } else {
@@ -321,7 +315,6 @@ const LaunchForm = () => {
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
       </h2>
-      <button className="border border-[red]" onClick={stackTest}>Stack</button>
       <form
         onSubmit={step < 4 ? handleNext : handleSubmit}
         className="space-y-4 p-4"
