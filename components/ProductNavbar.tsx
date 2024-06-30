@@ -82,7 +82,9 @@ const ProductNavbar: React.FC = () => {
                 <Link
                   href="/beta-testing"
                   className={`${
-                    pathname === "/beta-testing" ? "text-[#9B30FF]" : "text-[#282828]"
+                    pathname === "/beta-testing"
+                      ? "text-[#9B30FF]"
+                      : "text-[#282828]"
                   }`}
                 >
                   Beta
@@ -113,7 +115,7 @@ const ProductNavbar: React.FC = () => {
                     className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-full text-base md:text-lg flex items-center space-x-2"
                     onClick={() => connect({ connector })}
                   >
-                    <span>connect wallet</span>
+                    <span>connect</span>
                     <Image
                       src={WalletIcon}
                       alt="Wallet Icon"
