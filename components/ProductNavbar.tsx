@@ -25,7 +25,7 @@ const ProductNavbar: React.FC = () => {
         <div className="container mx-auto flex justify-between items-center py-2 px-4">
           <div>
             <Link href="/">
-              <Image src={Logo} alt="Productfindr Logo" className="w-18 h-9" />
+              <Image src={Logo} alt="ProductFindr Logo" className="w-18 h-9" />
             </Link>
           </div>
           <div className="relative hidden md:block flex-grow mx-4">

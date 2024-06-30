@@ -7,23 +7,28 @@ const FAQ = () => {
   const faqs = [
     {
       question: "What is ProductfindR?",
-      answer: "What is ProductfindR?",
+      answer:
+        "ProductFindR is a beta-testing platform that empowers startups to launch onchain products to a global audience, while allowing users to earn rewards through testing.",
     },
     {
-      question: "How does Productfindr work?",
-      answer: "How does it work?",
+      question: "How does ProductFindr work?",
+      answer:
+        "Founders can launch new onchain products or add new onchain features to existing products through the [Launch a product] tab. These products are then tested by beta testers, who provide reviews upon completion.",
     },
     {
-      question: "What are the benefits for beta tester on Productfindr?",
-      answer: "what are the benefits for beta testers?",
+      question: "What are the benefits for beta tester on ProductFindr?",
+      answer:
+        "Beta testers earn points that can be exchanged for token or fiat rewards upon reaching specific milestones.",
     },
     {
-      question: "what are the benefits for product owners on Productfindr?",
-      answer: "what are the benefits for product owners?",
+      question: "what are the benefits for product owners on ProductFindr?",
+      answer:
+        "Onchain startups get early feedback on their products or features, validate their ideas, and quicken go-to-market time.",
     },
     {
-      question: "Do I have to pay to use Productfindr?",
-      answer: "Do I have to pay?",
+      question: "Do I have to pay to use ProductFindr?",
+      answer:
+        "No. We have a free tier option available that any startup can use. However, you need to pay a fee to access a higher number and level of beta-testers.",
     },
   ];
 
