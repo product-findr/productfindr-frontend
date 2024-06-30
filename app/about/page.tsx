@@ -89,7 +89,7 @@ const Page = () => {
           <p className="mb-4 text-xl font-light">
             <span className="font-semibold"> Phase 3: </span>
             Launch Live Projects to the Market (100,000+ users) With a validated
-            and refined product, it's time to go live. Our platform will evolve
+            and refined product, it is time to go live. Our platform will evolve
             to support startups launching their onchain projects to a wider
             audience. We aim to provide the infrastructure and network necessary
             to reach thousands of onchain users, helping founders transition
