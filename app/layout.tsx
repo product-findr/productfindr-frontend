@@ -10,7 +10,7 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Productfindr",
+  title: "ProductFindr",
   description: "Search smarter, find better, earn Bigger",
 };
 
