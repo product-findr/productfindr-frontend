@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
         <div className="container mx-auto flex justify-between items-center py-2 pl-4">
           <div>
             <Link href="/">
-              <Image src={Logo} alt="Productfindr Logo" className="w-26 h-9" />
+              <Image src={Logo} alt="ProductFindr Logo" className="w-26 h-9" />
             </Link>
           </div>
           <div className="hidden md:flex space-x-6">
@@ -27,9 +27,7 @@ const Navbar: React.FC = () => {
                 <Link
                   href={"/launch"}
                   className={`${
-                    pathname === "/launch"
-                      ? "text-[#ECECEC]"
-                      : "text-white"
+                    pathname === "/launch" ? "text-[#ECECEC]" : "text-white"
                   }`}
                   aria-label="Go to Home"
                 >
