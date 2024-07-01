@@ -2,12 +2,13 @@ import { http, createConfig } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
 import { coinbaseWallet } from "wagmi/connectors";
 
-export const wagmiConfig = createConfig({
+export const config = createConfig({
   chains: [baseSepolia],
+  // turn off injected provider discovery
   multiInjectedProviderDiscovery: false,
   connectors: [
     coinbaseWallet({
-      appName: "ProductFindr",
+      appName: "Wagmi Smart Wallet",
       preference: "smartWalletOnly",
     }),
   ],
@@ -19,6 +20,6 @@ export const wagmiConfig = createConfig({
 
 declare module "wagmi" {
   interface Register {
-    config: typeof wagmiConfig;
+    config: typeof config;
   }
 }

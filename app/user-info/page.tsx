@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { truncateAddress } from "@/utils/utils";
 import { useAccount } from "wagmi";
+import { truncateAddress } from "@/utils/utils";
 import Image from "next/image";
 import ProfileImg from "../assets/icons/profile-pic.png";
 import Wallet from "../assets/icons/wallet.png";

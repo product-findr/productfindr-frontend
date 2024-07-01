@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { baseSepolia } from "wagmi/chains";
 import { WagmiProvider } from "wagmi";
 import { NEXT_PUBLIC_CDP_API_KEY } from "@/config/config"; 
-import { wagmiConfig } from "@/config/wagmi";
+import { config } from "./wagmi";
 
 type Props = { children: ReactNode };
 
@@ -16,7 +16,7 @@ const queryClient = new QueryClient();
 
 function OnchainProviders({ children }: Props) {
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
           apiKey={NEXT_PUBLIC_CDP_API_KEY}
