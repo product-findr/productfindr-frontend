@@ -6,7 +6,7 @@ import TimerIcon from "../app/assets/timer-icon.png";
 import { useSendTransaction, useWriteContract, useAccount } from "wagmi";
 import { parseEther } from "viem";
 import { publicClient } from "@/config/client";
-import { wagmiConfig } from "@/config/wagmi";
+import { config } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
 import { usdToETH } from "@/utils/utils";
@@ -38,16 +38,68 @@ const BetaForm = () => {
   const account = useAccount();
   const connectionStatus = account.status;
 
-  const handlePayWithStripe = (amount) => {
+  const handlePayWithStripe = async (amount) => {
     let url = "";
 
     if (amount === "1000") {
-      url = "https://buy.stripe.com/test_aEUaHF3Vi6b30hObII";
+      url = "https://buy.stripe.com/test_9AQbLwb7E3rJdhecMM";
     } else {
       url = "https://buy.stripe.com/test_8wM5nlbnK6b32pW5kl";
     }
 
-    window.location.href = url;
+    const newTab = window.open(url, "_blank");
+
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Delay for 1 minute (60000 milliseconds)
+    await delay(30000);
+
+    const callWebhook = async () => {
+      const payload = {
+        id: "evt_test_webhook",
+        object: "event",
+        created: Math.floor(Date.now() / 1000),
+        data: {
+          object: {
+            amount: amount,
+            billing_details: {
+              email: "customer@example.com",
+            },
+            receipt_email: "customer@example.com",
+            receipt_url: "https://example.com/receipt",
+            payment_method_details: {},
+            billing_details: {},
+            currency: "usd",
+          },
+        },
+        type: "payment_intent.succeeded",
+      };
+
+      try {
+        const response = await fetch("/api/webhook/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Stripe-Signature": process.env.STRIPE_WEBHOOK_SECRET,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        console.log("Data: ", data);
+
+        if (data.status === "success") {
+          alert("Webhook call was successful!");
+        } else {
+          alert("Webhook call failed.");
+        }
+      } catch (error) {
+        console.error("Error calling webhook:", error);
+        alert("Error calling webhook.");
+      }
+    };
+
+    await callWebhook();
   };
 
   const handlePayWithSmartWallet = async (amount) => {
@@ -243,7 +295,7 @@ const BetaForm = () => {
         ],
       });
 
-      const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
+      const transactionReceipt = await waitForTransactionReceipt(config, {
         hash: tx,
       });
 

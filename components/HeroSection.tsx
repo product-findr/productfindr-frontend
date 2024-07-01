@@ -27,7 +27,7 @@ const HeroSection: React.FC = () => {
           </div>
           <div className="flex items-center justify-center space-x-4 mt-8">
             <button className="bg-[#ECECEC] text-[#0B081C]  text-base sm:text-lg font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-full">
-              Start to earn
+              <a href="/products">Start to earn</a>
             </button>
             <button className="border text-[#ECECEC] text-base sm:text-lg font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-full">
               <a href="/launch"> Launch a product</a>

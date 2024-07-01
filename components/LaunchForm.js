@@ -3,10 +3,13 @@
 import React, { useState } from "react";
 import TimerIcon from "../app/assets/timer-icon.png";
 import { useWriteContract, useAccount } from "wagmi";
-import { wagmiConfig } from "@/config/wagmi";
+import { config } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import Image from "next/image";
-import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
+import {
+  ProductFindRMainAddress,
+  ProductFindRMainABI,
+} from "@/constant/constant";
 import Link from "next/link";
 import stack from "@/stacks/stacks";
 
@@ -240,9 +243,60 @@ const LaunchForm = () => {
     if (valid3) setStep(4);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitLaunch = async (e) => {
     e.preventDefault();
     setLaunch(true);
+
+    // const productDetails = {
+    //   productName: "Test Product",
+    //   tagLine: "This is a tagline",
+    //   productLink: "http://product.link",
+    //   twitterLink: "http://twitter.link",
+    //   description: "This is a test product",
+    //   isOpenSource: true,
+    //   category: "category",
+    //   thumbNail: "http://thumbnail.link",
+    //   mediaFile: "http://media.file",
+    //   loomLink: "http://loom.link",
+    //   workedWithTeam: true,
+    //   teamMembersInput: "team member",
+    //   pricingOption: "free",
+    //   offer: "offer details",
+    //   promoCode: "promo code",
+    //   expirationDate: "2023-12-31",
+    //   betaTestingLink: "http://beta.testing/link",
+    // };
+
+    // try {
+    //   const tx = await writeContractAsync({
+    //     abi: ProductFindRMainABI,
+    //     address: ProductFindRMainAddress,
+    //     functionName: "registerProduct",
+    //     args: [account.address, productDetails],
+    //   });
+
+    //   const transactionReceipt = await waitForTransactionReceipt(config, {
+    //     hash: tx,
+    //   });
+
+    //   if (transactionReceipt.status === "success") {
+    //     const addPoints = await stack.track("product_launch", {
+    //       points: 10,
+    //       account: account.address,
+    //       uniqueId: account.address,
+    //     });
+    //     console.log("Add Points: ", addPoints.success === "true");
+    //     setSuccess(true);
+    //     setLaunch(false);
+    //   } else {
+    //     alert("Failed to list product. Please try again.");
+    //     setLaunch(false);
+    //   }
+    // } catch (error) {
+    //   console.error("Failed Tx", error);
+    //   alert("Failed to list product. Please try again.");
+    //   setLaunch(false);
+    // }
 
     // Additional validation before submission
     const requiredFields = [
@@ -273,30 +327,37 @@ const LaunchForm = () => {
       return;
     }
 
-    const param = [
-      formData.productName,
-      formData.tagLine,
-      formData.productLink,
-      formData.twitterLink,
-      formData.description,
-      formData.isOpenSource,
-      formData.category,
-      formData.thumbNail,
-      formData.mediaFile,
-      formData.loomLink,
-      formData.workedWithTeam,
-      formData.teamMembersInput,
-    ];
+    const param = {
+      productName: formData.productName,
+      tagLine: formData.tagLine,
+      productLink: formData.productLink,
+      twitterLink: formData.twitterLink,
+      description: formData.description,
+      isOpenSource: formData.isOpenSource,
+      category: formData.category,
+      thumbNail: formData.thumbNail,
+      mediaFile: formData.mediaFile,
+      loomLink: formData.loomLink,
+      workedWithTeam: formData.workedWithTeam,
+      teamMembersInput: formData.teamMembersInput,
+      pricingOption: formData.pricingOption,
+      offer: formData.offer,
+      promoCode: formData.promoCode,
+      expirationDate: formData.expirationDate,
+      betaTestingLink: "",
+    };
+
+    console.log("Param: ", param);
 
     try {
       const tx = await writeContractAsync({
-        abi: ProductfindrABI,
-        address: ProductfindrAddress,
-        functionName: "listProduct",
-        args: [param],
+        abi: ProductFindRMainABI,
+        address: ProductFindRMainAddress,
+        functionName: "registerProduct",
+        args: [account.address, param],
       });
 
-      const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
+      const transactionReceipt = await waitForTransactionReceipt(config, {
         hash: tx,
       });
 
@@ -325,8 +386,9 @@ const LaunchForm = () => {
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
       </h2>
+      {/* <button onClick={handleSubmitLaunch}>Call Me</button> */}
       <form
-        onSubmit={step < 4 ? handleNext : handleSubmit}
+        onSubmit={step < 4 ? handleNext : handleSubmitLaunch}
         className="space-y-4 p-4"
       >
         {step === 1 && (
