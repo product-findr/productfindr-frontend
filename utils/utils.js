@@ -47,4 +47,8 @@ export async function usdToETH(amountInUSD) {
   }
 }
 
-  
+export function convertEmbedLink(originalLink) {
+  const parts = originalLink.split('/');
+  const videoOld = parts[parts.length - 1];
+  return `https://www.loom.com/embed/${videoOld}`;
+}

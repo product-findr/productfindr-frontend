@@ -55,9 +55,9 @@ const ProductNavbar: React.FC = () => {
             <ul className="flex space-x-6">
               <li className="group relative text-base md:text-lg">
                 <Link
-                  href="/product"
+                  href="/products"
                   className={`${
-                    pathname === "/product"
+                    pathname === "/products"
                       ? "text-[#9B30FF]"
                       : "text-[#282828]"
                   }`}
@@ -147,7 +147,7 @@ const ProductNavbar: React.FC = () => {
           <div className="md:hidden py-4 pl-4">
             <ul className="flex flex-col space-y-3">
               <li className="text-base md:text-lg mt-4">
-                <a href="/product" className="text-[#282828]">
+                <a href="/products" className="text-[#282828]">
                   Discover products
                 </a>
               </li>

@@ -10,7 +10,6 @@ import {
 } from "@/constant/constant";
 import Image from "next/image";
 import VectorIcon from "../assets/icons/vector.png";
-import Stripe from "../assets/icons/stripe.png";
 import ProductNavbar from "@/components/ProductNavbar";
 import "../styles/Product.css";
 

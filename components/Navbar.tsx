@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
             </ul>
 
             <a
-              href="/earning"
+              href="/products"
               className="bg-[#ECECEC] border-1px text-[#0B081C] px-4 py-2 rounded-full text-lg"
             >
               Start to earn
@@ -87,7 +87,7 @@ const Navbar: React.FC = () => {
             </ul>
             <div className="mt-3">
               <a
-                href="/earning"
+                href="/products"
                 className="bg-[#ECECEC] text-[#0B081C] px-4 py-1 rounded-md text-lg"
               >
                 Start to earn
