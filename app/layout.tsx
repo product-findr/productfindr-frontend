@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning={true}>
         <OnchainProviders>{children}</OnchainProviders>
       </body>
     </html>

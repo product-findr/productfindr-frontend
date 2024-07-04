@@ -26,7 +26,7 @@ const Steps = () => {
                 <h2 className="text-2xl text-[#9B30FF] font-bold mb-2">
                   Create an account
                 </h2>
-                <p className="text-lg">
+                <p className="text-sm text-gray-800">
                   Start by connecting your wallet to create an account on chain
                   and filling and updating your info
                 </p>
@@ -44,7 +44,7 @@ const Steps = () => {
                 <h2 className="text-2xl text-white font-bold mb-2">
                   Search for products
                 </h2>
-                <p className="text-lg text-gray-300">
+                <p className="text-sm text-gray-300">
                   You can search for products to beta-test on the platform
                 </p>
               </div>
@@ -59,7 +59,7 @@ const Steps = () => {
               </div>
               <div className="col-span-3">
                 <h2 className="text-2xl font-bold mb-2">Test applications</h2>
-                <p className="text-lg text-gray-400">
+                <p className="text-sm text-gray-400">
                   Beta-test exclusive features of products before they launch
                 </p>
               </div>
@@ -74,7 +74,7 @@ const Steps = () => {
               </div>
               <div className="col-span-3">
                 <h2 className="text-2xl font-bold mb-2">Submit feedbacks</h2>
-                <p className="text-lg text-gray-400">
+                <p className="text-sm text-gray-400">
                   Attach your comment and media feedbacks
                 </p>
               </div>
@@ -89,7 +89,7 @@ const Steps = () => {
               </div>
               <div className="col-span-3">
                 <h2 className="text-2xl font-bold mb-2">Earn points</h2>
-                <p className="text-lg text-gray-400">
+                <p className="text-sm text-gray-400">
                   Earn points after submitting feedbacks for beta tested
                   products
                 </p>

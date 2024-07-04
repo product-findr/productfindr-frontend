@@ -11,10 +11,12 @@ import {
 import Image from "next/image";
 import VectorIcon from "../assets/icons/vector.png";
 import ProductNavbar from "@/components/ProductNavbar";
+import Notification from "@/components/Notification";
+import stack from "@/stacks/stacks";
 import "../styles/Product.css";
 
 const ProductPage = () => {
-  const [fetchedProductDetail, setFetchedProductDetail] = useState([]); 
+  const [fetchedProductDetail, setFetchedProductDetail] = useState([]);
   const { data: fetchedData, isLoading: fetchLoading } = useReadContract({
     abi: ProductFindRMainABI,
     address: ProductFindRMainAddress,
@@ -24,7 +26,14 @@ const ProductPage = () => {
   const { writeContractAsync } = useWriteContract();
   const { address: account } = useAccount();
 
+  const [voting, setVoting] = useState(false);
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("");
+
   const handleUpvote = async (id) => {
+    setVoting(true);
     try {
       const tx = await writeContractAsync({
         abi: ProductFindRMainABI,
@@ -32,12 +41,21 @@ const ProductPage = () => {
         functionName: "upvoteProduct",
         args: [id, account],
       });
-      console.log("Upvote transaction:", tx); 
+      setNotificationMessage("Upvote transaction success.");
+      setNotificationType("success");
+      setShowNotification(true);
+      setVoting(false);
     } catch (error) {
+      if (error.message.includes("Connector not connected.")) {
+        setNotificationMessage("Please connect your wallet to proceed.");
+        setNotificationType("warning");
+        setShowNotification(true);
+        setVoting(false);
+      }
       console.error("Error upvoting product:", error);
     }
+    setVoting(false);
   };
-
 
   useEffect(() => {
     if (fetchedData && fetchedData.length > 0) {
@@ -131,7 +149,7 @@ const ProductPage = () => {
         <div>
           <div className="product-list">
             {fetchedProductDetail.map((product, index) => {
-              const { id, details } = product;
+              const { id, upvotes, details } = product;
               const { productName, thumbNail, tagLine } = details;
 
               return (
@@ -149,9 +167,12 @@ const ProductPage = () => {
                     />
                   </div>
                   <div className="flex flex-col flex-grow">
-                  <Link href={`/productDetails/${id}/`} className="text-xl font-bold mb-1 hover:underline">
-                    {productName}
-                  </Link>
+                    <Link
+                      href={`/productDetails/${id}/`}
+                      className="text-xl font-bold mb-1 hover:underline"
+                    >
+                      {productName}
+                    </Link>
                     <span className="text-[#9B30FF]">⭐⭐⭐⭐⭐</span>
                   </div>
                   <div className="flex flex-col justify-center">
@@ -160,20 +181,30 @@ const ProductPage = () => {
                   </div>
                   <div className="flex flex-col-4 flex-grow items-center justify-end">
                     <div
-                      className="bg-[#2828280D] p-4 rounded-xl"
-                      onClick={() => handleUpvote(id)}
+                      className="bg-[#2828280D] flex justify-between p-4 rounded-xl"
+                      onClick={handleUpvote}
                     >
                       <Image
                         src={VectorIcon}
                         alt="vector"
                         className="rounded-lg"
                       />
+                      <span className="text-gray=200 ml-2">
+                        {voting ? "..." : upvotes.toString()}
+                      </span>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
+          {showNotification && (
+            <Notification
+              message={notificationMessage}
+              onClose={() => setShowNotification(false)}
+              type={notificationType}
+            />
+          )}
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import TimerIcon from "../app/assets/timer-icon.png";
 import { useWriteContract, useAccount } from "wagmi";
 import { config } from "@/config/wagmi";
@@ -10,7 +11,6 @@ import {
   ProductFindRMainAddress,
   ProductFindRMainABI,
 } from "@/constant/constant";
-import Link from "next/link";
 import stack from "@/stacks/stacks";
 
 const LaunchForm = () => {
@@ -50,6 +50,7 @@ const LaunchForm = () => {
 
   const account = useAccount();
   const connectionStatus = account.status;
+  
 
   const isValidUrl = (urlString) => {
     try {
@@ -205,7 +206,6 @@ const LaunchForm = () => {
         ...prev,
         connection: "Please connect your wallet to proceed",
       }));
-
       return;
     }
 
@@ -246,57 +246,6 @@ const LaunchForm = () => {
   const handleSubmitLaunch = async (e) => {
     e.preventDefault();
     setLaunch(true);
-
-    // const productDetails = {
-    //   productName: "Test Product",
-    //   tagLine: "This is a tagline",
-    //   productLink: "http://product.link",
-    //   twitterLink: "http://twitter.link",
-    //   description: "This is a test product",
-    //   isOpenSource: true,
-    //   category: "category",
-    //   thumbNail: "http://thumbnail.link",
-    //   mediaFile: "http://media.file",
-    //   loomLink: "http://loom.link",
-    //   workedWithTeam: true,
-    //   teamMembersInput: "team member",
-    //   pricingOption: "free",
-    //   offer: "offer details",
-    //   promoCode: "promo code",
-    //   expirationDate: "2023-12-31",
-    //   betaTestingLink: "http://beta.testing/link",
-    // };
-
-    // try {
-    //   const tx = await writeContractAsync({
-    //     abi: ProductFindRMainABI,
-    //     address: ProductFindRMainAddress,
-    //     functionName: "registerProduct",
-    //     args: [account.address, productDetails],
-    //   });
-
-    //   const transactionReceipt = await waitForTransactionReceipt(config, {
-    //     hash: tx,
-    //   });
-
-    //   if (transactionReceipt.status === "success") {
-    //     const addPoints = await stack.track("product_launch", {
-    //       points: 10,
-    //       account: account.address,
-    //       uniqueId: account.address,
-    //     });
-    //     console.log("Add Points: ", addPoints.success === "true");
-    //     setSuccess(true);
-    //     setLaunch(false);
-    //   } else {
-    //     alert("Failed to list product. Please try again.");
-    //     setLaunch(false);
-    //   }
-    // } catch (error) {
-    //   console.error("Failed Tx", error);
-    //   alert("Failed to list product. Please try again.");
-    //   setLaunch(false);
-    // }
 
     // Additional validation before submission
     const requiredFields = [
@@ -347,8 +296,6 @@ const LaunchForm = () => {
       betaTestingLink: "",
     };
 
-    console.log("Param: ", param);
-
     try {
       const tx = await writeContractAsync({
         abi: ProductFindRMainABI,
@@ -386,7 +333,6 @@ const LaunchForm = () => {
       <h2 className="text-[#9B30FF] text-3xl font-bold mb-6 text-start py-6">
         Launch a product🚀{" "}
       </h2>
-      {/* <button onClick={handleSubmitLaunch}>Call Me</button> */}
       <form
         onSubmit={step < 4 ? handleNext : handleSubmitLaunch}
         className="space-y-4 p-4"
@@ -579,7 +525,7 @@ const LaunchForm = () => {
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
-                placeholder="What best describes your product?"
+                placeholder="What best describes your product? - seperate with a comma , "
               />{" "}
               {errors.category && (
                 <p className="text-red-500 text-xs md:text-sm">
