@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useWriteContract, useAccount } from "wagmi";
 import { useReadContract } from "wagmi";
+import { config } from "@/config/wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import {
   ProductFindRMainAddress,
   ProductFindRMainABI,
@@ -41,6 +43,19 @@ const ProductPage = () => {
         functionName: "upvoteProduct",
         args: [id, account],
       });
+
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        hash: tx,
+      });
+
+      if (transactionReceipt.status === "success") {
+        const addPoints = await stack.track("upvote", {
+          points: 5,
+          account: account,
+          uniqueId: account,
+        });
+        console.log("Added Points: ", addPoints.status);
+      }
       setNotificationMessage("Upvote transaction success.");
       setNotificationType("success");
       setShowNotification(true);
@@ -212,3 +227,5 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
+
+

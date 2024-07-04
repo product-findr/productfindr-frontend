@@ -16,6 +16,7 @@ import LeftArrowIcon from "../../assets/icons/LeftArrowIcon.svg";
 import VectorIcon from "../../assets/icons/vector.png";
 import LinkIcon from "../../assets/icons/Link.png";
 import Notification from "@/components/Notification";
+import stack from "@/stacks/stacks";
 import "../../styles//Product.css";
 
 const ProductDetail = ({ params: { id } }) => {
@@ -47,7 +48,20 @@ const ProductDetail = ({ params: { id } }) => {
         functionName: "upvoteProduct",
         args: [id, account],
       });
-      console.log("Transaction Details: ", tx);
+
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        hash: tx,
+      });
+
+      if (transactionReceipt.status === "success") {
+        const addPoints = await stack.track("upvote", {
+          points: 5,
+          account: account,
+          uniqueId: account,
+        });
+
+        console.log("Added Points: ", addPoints.status);
+      }
       if (tx && tx !== "undefined") {
         setNotificationMessage("Upvote transaction success.");
         setNotificationType("success");
