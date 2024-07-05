@@ -163,55 +163,62 @@ const ProductPage = () => {
         <div className="border-t border-[#28282880]"></div>
         <div>
           <div className="product-list">
-            {fetchedProductDetail.map((product, index) => {
-              const { id, upvotes, details } = product;
-              const { productName, thumbNail, tagLine } = details;
+            {fetchedProductDetail
+              .sort((a, b) => Number(b.id) - Number(a.id))
+              .map((product, index) => {
+                // map((product, index) => {
+                const { id, upvotes, details } = product;
+                const { productName, thumbNail, tagLine } = details;
 
-              return (
-                <div
-                  key={id}
-                  className="flex space-x-8 bg-[#2828280D] rounded-2xl p-4 mt-4"
-                >
-                  <div className="flex-none">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${thumbNail}`}
-                      alt="Logo"
-                      width={52}
-                      height={52}
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div className="flex flex-col flex-grow">
-                    <Link
-                      href={`/productDetails/${id}/`}
-                      className="text-xl font-bold mb-1 hover:underline"
-                    >
-                      {productName}
-                    </Link>
-                    <span className="text-[#9B30FF]">⭐⭐⭐⭐⭐</span>
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-gray-500 text-center mb-1">{tagLine}</p>
-                    <p className="text-gray-500 text-center">Followers: 100k</p>
-                  </div>
-                  <div className="flex flex-col-4 flex-grow items-center justify-end">
-                    <div
-                      className="bg-[#2828280D] flex justify-between p-4 rounded-xl"
-                      onClick={handleUpvote}
-                    >
+                return (
+                  <div
+                    key={id}
+                    className="flex space-x-8 bg-[#2828280D] rounded-2xl p-4 mt-4"
+                  >
+                    <div className="flex-none">
                       <Image
-                        src={VectorIcon}
-                        alt="vector"
-                        className="rounded-lg"
+                        src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${thumbNail}`}
+                        alt="Logo"
+                        width={52}
+                        height={52}
+                        className="rounded-full"
                       />
-                      <span className="text-gray=200 ml-2">
-                        {voting ? "..." : upvotes.toString()}
-                      </span>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                      <Link
+                        href={`/productDetails/${id}/`}
+                        className="text-xl font-bold mb-1 hover:underline"
+                      >
+                        {productName}
+                      </Link>
+                      <span className="text-[#9B30FF]">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-gray-500 text-center mb-1">
+                        {tagLine}
+                      </p>
+                      <p className="text-gray-500 text-center">
+                        Followers: 100k
+                      </p>
+                    </div>
+                    <div className="flex flex-col-4 flex-grow items-center justify-end">
+                      <div
+                        className="bg-[#2828280D] flex justify-between p-4 rounded-xl"
+                        onClick={handleUpvote}
+                      >
+                        <Image
+                          src={VectorIcon}
+                          alt="vector"
+                          className="rounded-lg"
+                        />
+                        <span className="text-gray=200 ml-2">
+                          {voting ? "..." : upvotes.toString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
           {showNotification && (
             <Notification
@@ -227,5 +234,3 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
-
-
