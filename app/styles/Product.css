@@ -1,23 +1,20 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    background-color: white;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  background-color: white;
 }
-
 
 .sidebar-button {
-  font-size: xx-small; 
-  margin-left: 1rem; 
+  font-size: xx-small;
+  margin-left: 1rem;
 }
-
 
 .spacious-text {
   padding: 16px;
-  line-height: 1.8; 
+  line-height: 1.8;
   margin-top: 16px;
   font-size: 1.125rem;
   color: #282828;
@@ -25,13 +22,16 @@
 }
 
 .loomVideo {
-  position: relative; 
-  padding-bottom: 61.96213425129088%; 
+  position: relative;
+  padding-bottom: 61.96213425129088%;
   height: 0;
 }
 
-
-
+.featureLoomLink {
+  position: relative;
+  padding-bottom: 61.96213425129088%;
+  height: 0;
+}
 
 @media only screen and (max-width: 600px) {
   :root {

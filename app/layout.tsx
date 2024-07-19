@@ -1,4 +1,5 @@
 import OnchainProviders from "@/config/OnchainProviders";
+import { LaunchDataProvider } from "../context/FormDataContext";
 import type { Metadata } from "next";
 
 import "./global.css";
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <OnchainProviders>{children}</OnchainProviders>
+        <LaunchDataProvider>
+          <OnchainProviders>{children}</OnchainProviders>
+        </LaunchDataProvider>
       </body>
     </html>
   );

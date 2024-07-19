@@ -25,7 +25,13 @@ const ProductNavbar: React.FC = () => {
         <div className="container mx-auto flex justify-between items-center py-2 px-4">
           <div>
             <Link href="/">
-              <Image src={Logo} alt="ProductFindr Logo" className="w-18 h-9" />
+              <Image
+                src={Logo}
+                priority={true}
+                alt="logo"
+                height="100"
+                width="100"
+              />
             </Link>
           </div>
           <div className="relative hidden md:block flex-grow mx-4">
@@ -69,25 +75,14 @@ const ProductNavbar: React.FC = () => {
               </li>
               <li className="group relative text-base md:text-lg">
                 <Link
-                  href="/launch"
+                  href="/beta-products"
                   className={`${
-                    pathname === "/launch" ? "text-[#9B30FF]" : "text-[#282828]"
-                  }`}
-                >
-                  Launch
-                </Link>
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
-              </li>
-              <li className="group relative text-base md:text-lg">
-                <Link
-                  href="/beta-testing"
-                  className={`${
-                    pathname === "/beta-testing"
+                    pathname === "/beta-products"
                       ? "text-[#9B30FF]"
                       : "text-[#282828]"
                   }`}
                 >
-                  Beta
+                  Beta Testing
                 </Link>
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[#9B30FF] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-bottom"></div>
               </li>
@@ -152,12 +147,7 @@ const ProductNavbar: React.FC = () => {
                 </a>
               </li>
               <li className="text-base md:text-lg">
-                <a href="/launch" className="text-[#9B30FF]">
-                  Launch
-                </a>
-              </li>
-              <li className="text-base md:text-lg">
-                <a href="/beta-testing" className="text-[#9B30FF]">
+                <a href="/beta-products" className="text-[#9B30FF]">
                   Beta Testing
                 </a>
               </li>

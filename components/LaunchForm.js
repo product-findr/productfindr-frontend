@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
+import { FormDataContext } from "@/context/FormDataContext";
 import Link from "next/link";
 import TimerIcon from "../app/assets/timer-icon.png";
 import { useWriteContract, useAccount } from "wagmi";
@@ -14,7 +16,8 @@ import {
 import stack from "@/stacks/stacks";
 
 const LaunchForm = () => {
-  const [formData, setFormData] = useState({
+  const { formData: globalFormData, setFormData } = useContext(FormDataContext);
+  const [localFormData, setLocalFormData] = useState({
     productName: "",
     tagLine: "",
     productLink: "",
@@ -31,7 +34,10 @@ const LaunchForm = () => {
     offer: "",
     promoCode: "",
     expirationDate: "",
+    betaTestingLink: "",
   });
+
+  const [showBetaTesting, setShowBetaTesting] = useState(false);
 
   const [errors, setErrors] = useState({});
   const [step, setStep] = useState(1);
@@ -48,9 +54,10 @@ const LaunchForm = () => {
 
   const { writeContractAsync } = useWriteContract();
 
+  const router =useRouter();
+
   const account = useAccount();
   const connectionStatus = account.status;
-  
 
   const isValidUrl = (urlString) => {
     try {
@@ -100,7 +107,7 @@ const LaunchForm = () => {
     const { name, value, type } = e.target;
     const fieldValue = type === "checkbox" ? e.target.checked : value;
 
-    setFormData((prevFormData) => ({
+    setLocalFormData((prevFormData) => ({
       ...prevFormData,
       [name]: fieldValue,
     }));
@@ -110,7 +117,7 @@ const LaunchForm = () => {
 
   const handleRadioChange = (e) => {
     const value = e.target.value === "yes";
-    setFormData((prevFormData) => ({
+    setLocalFormData((prevFormData) => ({
       ...prevFormData,
       isOpenSource: value,
     }));
@@ -146,7 +153,7 @@ const LaunchForm = () => {
         setMediaFileCid(resData.IpfsHash);
         setUploadingMediaFile(false);
       }
-      setFormData((prevFormData) => ({
+      setLocalFormData((prevFormData) => ({
         ...prevFormData,
         [field]: resData.IpfsHash,
       }));
@@ -198,6 +205,11 @@ const LaunchForm = () => {
     }
   };
 
+  const handleBetaTestingChange = (e) => {
+    const value = e.target.value === "yes";
+    setShowBetaTesting(value);
+  };
+
   const handleNext = (e) => {
     e.preventDefault();
 
@@ -221,7 +233,7 @@ const LaunchForm = () => {
 
     let valid = true;
     part1Fields.forEach((field) => {
-      const error = validateField(field, formData[field] || "");
+      const error = validateField(field, localFormData[field] || "");
       if (error) valid = false;
     });
 
@@ -230,14 +242,14 @@ const LaunchForm = () => {
 
     let valid2 = true;
     part2Field.forEach((field) => {
-      const error = validateField(field, formData[field] || "");
+      const error = validateField(field, localFormData[field] || "");
       if (error) valid2 = false;
     });
     if (valid2) setStep(3);
     const part3Field = ["teamMembersInput"];
     let valid3 = true;
     part3Field.forEach((field) => {
-      const error = validateField(field, formData[field] || "");
+      const error = validateField(field, localFormData[field] || "");
       if (error) valid3 = false;
     });
     if (valid3) setStep(4);
@@ -246,6 +258,7 @@ const LaunchForm = () => {
   const handleSubmitLaunch = async (e) => {
     e.preventDefault();
     setLaunch(true);
+    setFormData(localFormData);
 
     // Additional validation before submission
     const requiredFields = [
@@ -267,7 +280,7 @@ const LaunchForm = () => {
 
     let isValid = true;
     requiredFields.forEach((field) => {
-      const error = validateField(field, formData[field]);
+      const error = validateField(field, localFormData[field]);
       if (error) isValid = false;
     });
 
@@ -277,54 +290,75 @@ const LaunchForm = () => {
     }
 
     const param = {
-      productName: formData.productName,
-      tagLine: formData.tagLine,
-      productLink: formData.productLink,
-      twitterLink: formData.twitterLink,
-      description: formData.description,
-      isOpenSource: formData.isOpenSource,
-      category: formData.category,
-      thumbNail: formData.thumbNail,
-      mediaFile: formData.mediaFile,
-      loomLink: formData.loomLink,
-      workedWithTeam: formData.workedWithTeam,
-      teamMembersInput: formData.teamMembersInput,
-      pricingOption: formData.pricingOption,
-      offer: formData.offer,
-      promoCode: formData.promoCode,
-      expirationDate: formData.expirationDate,
-      betaTestingLink: "",
+      productName: localFormData.productName,
+      tagLine: localFormData.tagLine,
+      productLink: localFormData.productLink,
+      twitterLink: localFormData.twitterLink,
+      description: localFormData.description,
+      isOpenSource: localFormData.isOpenSource,
+      category: localFormData.category,
+      thumbNail: localFormData.thumbNail,
+      mediaFile: localFormData.mediaFile,
+      loomLink: localFormData.loomLink,
+      workedWithTeam: localFormData.workedWithTeam,
+      teamMembersInput: localFormData.teamMembersInput,
+      pricingOption: localFormData.pricingOption,
+      offer: localFormData.offer,
+      promoCode: localFormData.promoCode,
+      expirationDate: localFormData.expirationDate,
+      betaTestingLink: localFormData.betaTestingLink,
     };
 
-    try {
-      const tx = await writeContractAsync({
-        abi: ProductFindRMainABI,
-        address: ProductFindRMainAddress,
-        functionName: "registerProduct",
-        args: [account.address, param],
-      });
+    const emptyBetaTestingDetails = {
+      contractAddress: "",
+      targetNumbersOfTester: 0,
+      testingGoal: "",
+      goals: [],
+      startingDate: 0,
+      endingDate: 0,
+      featureLoomLink: "",
+    };
 
-      const transactionReceipt = await waitForTransactionReceipt(config, {
-        hash: tx,
-      });
+    if (showBetaTesting) {
+      router.push("/beta-testing");
+    } else {
+      const betaTestingAvailable = false;
 
-      if (transactionReceipt.status === "success") {
-        const addPoints = await stack.track("product_launch", {
-          points: 10,
-          account: account.address,
-          uniqueId: account.address,
+      try {
+        const tx = await writeContractAsync({
+          abi: ProductFindRMainABI,
+          address: ProductFindRMainAddress,
+          functionName: "registerProduct",
+          args: [
+            account.address,
+            param,
+            betaTestingAvailable,
+            emptyBetaTestingDetails,
+          ],
         });
-        console.log("Add Points: ", addPoints.success === "true");
-        setSuccess(true);
-        setLaunch(false);
-      } else {
+
+        const transactionReceipt = await waitForTransactionReceipt(config, {
+          hash: tx,
+        });
+
+        if (transactionReceipt.status === "success") {
+          const addPoints = await stack.track("product_launch", {
+            points: 10,
+            account: account.address,
+            uniqueId: account.address,
+          });
+          console.log("Add Points: ", addPoints.success === "true");
+          setSuccess(true);
+          setLaunch(false);
+        } else {
+          alert("Failed to list product. Please try again.");
+          setLaunch(false);
+        }
+      } catch (error) {
+        console.error("Failed Tx", error);
         alert("Failed to list product. Please try again.");
         setLaunch(false);
       }
-    } catch (error) {
-      console.error("Failed Tx", error);
-      alert("Failed to list product. Please try again.");
-      setLaunch(false);
     }
   };
 
@@ -354,7 +388,7 @@ const LaunchForm = () => {
                 type="text"
                 id="productName"
                 name="productName"
-                value={formData.productName}
+                value={localFormData.productName}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -379,7 +413,7 @@ const LaunchForm = () => {
                 type="text"
                 id="tagLine"
                 name="tagLine"
-                value={formData.tagLine}
+                value={localFormData.tagLine}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -404,7 +438,7 @@ const LaunchForm = () => {
                 type="text"
                 id="productLink"
                 name="productLink"
-                value={formData.productLink}
+                value={localFormData.productLink}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -429,7 +463,7 @@ const LaunchForm = () => {
                     type="radio"
                     name="isOpenSource"
                     value="yes"
-                    checked={formData.isOpenSource === true}
+                    checked={localFormData.isOpenSource === true}
                     onChange={handleRadioChange}
                     className="form-radio h-4 w-4 text-gray-700 transition duration-150 ease-in-out"
                   />
@@ -440,7 +474,7 @@ const LaunchForm = () => {
                     type="radio"
                     name="isOpenSource"
                     value="no"
-                    checked={formData.isOpenSource === false}
+                    checked={localFormData.isOpenSource === false}
                     onChange={handleRadioChange}
                     className="form-radio h-4 w-4 text-gray-700 transition duration-150 ease-in-out"
                   />
@@ -467,7 +501,7 @@ const LaunchForm = () => {
                 type="url"
                 id="twitterLink"
                 name="twitterLink"
-                value={formData.twitterLink}
+                value={localFormData.twitterLink}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -491,7 +525,7 @@ const LaunchForm = () => {
               <textarea
                 id="description"
                 name="description"
-                value={formData.description}
+                value={localFormData.description}
                 onChange={handleChange}
                 required
                 rows={8}
@@ -521,7 +555,7 @@ const LaunchForm = () => {
                 type="text"
                 id="category"
                 name="category"
-                value={formData.category}
+                value={localFormData.category}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -633,7 +667,7 @@ const LaunchForm = () => {
                 type="url"
                 id="loomLink"
                 name="loomLink"
-                value={formData.loomLink}
+                value={localFormData.loomLink}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -675,10 +709,10 @@ const LaunchForm = () => {
                     id="workedAlone"
                     name="workedWithTeam"
                     value="false"
-                    checked={formData.workedWithTeam === false}
+                    checked={localFormData.workedWithTeam === false}
                     onChange={() =>
-                      setFormData({
-                        ...formData,
+                      setLocalFormData({
+                        ...localFormData,
                         workedWithTeam: false,
                       })
                     }
@@ -693,10 +727,10 @@ const LaunchForm = () => {
                     id="workedWithTeam"
                     name="workedWithTeam"
                     value="true"
-                    checked={formData.workedWithTeam === true}
+                    checked={localFormData.workedWithTeam === true}
                     onChange={() =>
-                      setFormData({
-                        ...formData,
+                      setLocalFormData({
+                        ...localFormData,
                         workedWithTeam: true,
                       })
                     }
@@ -720,7 +754,7 @@ const LaunchForm = () => {
                 type="text"
                 id="teamMembersInput"
                 name="teamMembersInput"
-                value={formData.teamMembersInput}
+                value={localFormData.teamMembersInput}
                 onChange={handleChange}
                 required
                 className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
@@ -747,25 +781,25 @@ const LaunchForm = () => {
           <>
             {success === true ? (
               <>
-                <div class="text-center">
-                  <h2 class="text-[#9B30FF] text-3xl font-bold mb-6">
+                <div className="text-center">
+                  <h2 className="text-[#9B30FF] text-3xl font-bold mb-6">
                     Congratulations 🎉
                   </h2>
-                  <p class="text-lg">
+                  <p className="text-lg">
                     You have successfully launched your product.
                   </p>
                   <Image
                     src={TimerIcon}
                     alt="success"
-                    class="rounded-lg mt-6 mx-auto"
+                    className="rounded-lg mt-6 mx-auto"
                     width={400}
                     height={300}
                   />
-                  <p class="text-lg mt-6">
+                  <p className="text-lg mt-6">
                     While you wait 24hrs for our onchain analysis, you can set
                     up a beta testing program for the product.
                   </p>
-                  <div class="mt-6 flex justify-center space-x-4">
+                  <div className="mt-6 flex justify-center space-x-4">
                     <Link
                       href="/"
                       className="bg-[#ECECEC] text-[#0B081C] px-4 py-4 rounded-2xl text-lg flex items-center space-x-2"
@@ -799,7 +833,7 @@ const LaunchForm = () => {
                             className="form-radio text-indigo-600"
                             name="pricingOption"
                             value="free"
-                            checked={formData.pricingOption === "free"}
+                            checked={localFormData.pricingOption === "free"}
                             onChange={handleChange}
                           />
                           <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
@@ -817,7 +851,7 @@ const LaunchForm = () => {
                             className="form-radio text-indigo-600"
                             name="pricingOption"
                             value="paid"
-                            checked={formData.pricingOption === "paid"}
+                            checked={localFormData.pricingOption === "paid"}
                             onChange={handleChange}
                           />
                           <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
@@ -836,7 +870,9 @@ const LaunchForm = () => {
                             className="form-radio text-indigo-600"
                             name="pricingOption"
                             value="paidWithTrial"
-                            checked={formData.pricingOption === "paidWithTrial"}
+                            checked={
+                              localFormData.pricingOption === "paidWithTrial"
+                            }
                             onChange={handleChange}
                           />
                           <span className="ml-2 text-md font-bold text-gray-700 sm:text-xs md:text-base">
@@ -872,7 +908,7 @@ const LaunchForm = () => {
                         id="offer"
                         name="offer"
                         placeholder="2 months free"
-                        value={formData.offer}
+                        value={localFormData.offer}
                         onChange={handleChange}
                         className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
                       />
@@ -889,7 +925,7 @@ const LaunchForm = () => {
                         id="promoCode"
                         name="promoCode"
                         placeholder="PFR300WWW"
-                        value={formData.promoCode}
+                        value={localFormData.promoCode}
                         onChange={handleChange}
                         className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
                       />
@@ -899,20 +935,74 @@ const LaunchForm = () => {
                         className="block text-sm font-bold text-gray-700 mb-2"
                         htmlFor="expirationDate"
                       >
-                        Expiration date
+                        Expiration dates
                       </label>
                       <input
                         type="date"
                         id="expirationDate"
                         name="expirationDate"
                         placeholder="None"
-                        value={formData.expirationDate}
+                        value={localFormData.expirationDate}
                         onChange={handleChange}
                         className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
                       />
                     </div>
                   </div>
                 </div>
+                <div>
+                  <label className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base">
+                    Do you want to include beta testing?
+                  </label>
+                  <div>
+                    <label className="mr-4">
+                      <input
+                        type="radio"
+                        name="betaTesting"
+                        value="yes"
+                        onChange={handleBetaTestingChange}
+                        checked={showBetaTesting === true}
+                      />
+                      Yes
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="betaTesting"
+                        value="no"
+                        onChange={handleBetaTestingChange}
+                        checked={showBetaTesting === false}
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+
+                {showBetaTesting && (
+                  <div>
+                    <label
+                      htmlFor="betaTestingLink"
+                      className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
+                    >
+                      Link to beta test feature 🔗
+                      <span className="text-[#9B30FF] pl-2"> * </span>
+                    </label>
+                    <input
+                      type="url"
+                      id="betaTestingLink"
+                      name="betaTestingLink"
+                      value={localFormData.betaTestingLink}
+                      onChange={handleChange}
+                      required
+                      className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
+                      placeholder="Insert link to beta test feature"
+                    />
+                    {errors.betaTestingLink && (
+                      <p className="text-red-500 text-xs md:text-sm">
+                        {errors.betaTestingLink}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <div className="text-right">
                   <button

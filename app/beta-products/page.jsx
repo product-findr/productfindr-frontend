@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useWriteContract, useReadContract, useAccount } from "wagmi";
+import { useWriteContract, useAccount } from "wagmi";
+import { useReadContract } from "wagmi";
 import { config } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import {
@@ -16,7 +17,7 @@ import Notification from "@/components/Notification";
 import stack from "@/stacks/stacks";
 import "../styles/Product.css";
 
-const ProductPage = () => {
+const BetaProducts = () => {
   const [fetchedProductDetail, setFetchedProductDetail] = useState([]);
   const { data: fetchedData, isLoading: fetchLoading } = useReadContract({
     abi: ProductFindRMainABI,
@@ -73,8 +74,11 @@ const ProductPage = () => {
 
   useEffect(() => {
     if (fetchedData && fetchedData.length > 0) {
-      const filteredData = fetchedData.filter(item => !item.hasBetaTestingDetails);
+      const filteredData = fetchedData.filter(
+        (item) => item.hasBetaTestingDetails
+      );
       setFetchedProductDetail(filteredData);
+      console.log("Filtered Fetch Detail: ", filteredData);
     }
   }, [fetchedData]);
 
@@ -85,7 +89,7 @@ const ProductPage = () => {
         <div className="container mx-auto p-4">
           <div className="bg-gray-100 p-4 rounded-xl">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Welcome to Productfind<span className="text-[#9B30FF]">R</span> 🔎
+              Beta Testing Portal 🔎
             </h2>
             <p className="text-gray-600 mb-2">
               &quot;Search smarter, find better, earn BIGGER&quot; 💸
@@ -163,7 +167,7 @@ const ProductPage = () => {
         <div>
           <div className="product-list">
             {fetchedProductDetail
-              .filter((item) => !item.product.hasBetaTestingDetails) 
+              .filter((item) => !item.product.hasBetaTestingDetails) // Filter for hasBetaTestingDetails === false
               .sort((a, b) => Number(b.product.id) - Number(a.product.id))
               .map((item) => {
                 const { product } = item;
@@ -202,19 +206,12 @@ const ProductPage = () => {
                       </p>
                     </div>
                     <div className="flex flex-col-4 flex-grow items-center justify-end">
-                      <div
-                        className="bg-[#2828280D] flex justify-between p-4 rounded-xl"
-                        onClick={() => handleUpvote(id)}
+                      <a
+                        className="bg-[#6820B0] text-white text-xs sm:text-sm p-3 sm:p-4 rounded-xl w-full sm:w-auto text-center"
+                        href={`/betaTest-detail/${id}`}
                       >
-                        <Image
-                          src={VectorIcon}
-                          alt="vector"
-                          className="rounded-lg"
-                        />
-                        <span className="text-gray=200 ml-2">
-                          {voting ? "..." : upvotes.toString()}
-                        </span>
-                      </div>
+                        Start Beta-Testing
+                      </a>
                     </div>
                   </div>
                 );
@@ -233,4 +230,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default BetaProducts;

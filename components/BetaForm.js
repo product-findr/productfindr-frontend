@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { FormDataContext } from "@/context/FormDataContext";
 import Link from "next/link";
 import Image from "next/image";
 import TimerIcon from "../app/assets/timer-icon.png";
@@ -8,12 +9,16 @@ import { parseEther } from "viem";
 import { publicClient } from "@/config/client";
 import { config } from "@/config/wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
-import { ProductfindrAddress, ProductfindrABI } from "@/constant/constant";
+import {
+  ProductFindRMainAddress,
+  ProductFindRMainABI,
+} from "@/constant/constant";
 import { usdToETH } from "@/utils/utils";
 import stack from "@/stacks/stacks";
 
 const BetaForm = () => {
-  const [formData, setFormData] = useState({
+  const { formData: globalFormData } = useContext(FormDataContext);
+  const [localFormData, setLocalFormData] = useState({
     productName: "",
     contractAddress: "",
     targetNumberOfTesters: "",
@@ -142,8 +147,8 @@ const BetaForm = () => {
         error = `${name.replace(/([A-Z])/g, " $1").toLowerCase()} is required.`;
       } else if (
         name === "endingDate" &&
-        formData.startingDate &&
-        value < formData.startingDate
+        localFormData.startingDate &&
+        value < localFormData.startingDate
       ) {
         error = "Ending date cannot be earlier than starting date.";
       }
@@ -160,7 +165,7 @@ const BetaForm = () => {
   const validateContractAddress = async () => {
     try {
       const bytecode = await publicClient.getBytecode({
-        address: formData.contractAddress,
+        address: localFormData.contractAddress,
       });
 
       if (!bytecode) {
@@ -176,7 +181,7 @@ const BetaForm = () => {
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
-    let updatedGoals = [...formData.goals];
+    let updatedGoals = [...localFormData.goals];
 
     if (checked) {
       updatedGoals.push(value);
@@ -184,8 +189,8 @@ const BetaForm = () => {
       updatedGoals = updatedGoals.filter((goal) => goal !== value);
     }
 
-    setFormData({
-      ...formData,
+    setLocalFormData({
+      ...localFormData,
       goals: updatedGoals,
     });
   };
@@ -193,8 +198,8 @@ const BetaForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     validateField(name, value);
-    setFormData({
-      ...formData,
+    setLocalFormData({
+      ...localFormData,
       [name]: value,
     });
   };
@@ -224,7 +229,7 @@ const BetaForm = () => {
     let valid = true;
 
     for (const field of betaTestingFields) {
-      const error = validateField(field, formData[field] || "");
+      const error = validateField(field, localFormData[field] || "");
       if (error) {
         valid = false;
         console.log(`Field '${field}' validation failed: ${error}`);
@@ -236,7 +241,7 @@ const BetaForm = () => {
     }
 
     // Validate goals
-    if (formData.goals.length === 0) {
+    if (localFormData.goals.length === 0) {
       setErrors((prev) => ({
         ...prev,
         goals: "At least one goal must be selected.",
@@ -252,7 +257,7 @@ const BetaForm = () => {
 
     try {
       const isValidContractAddress = await validateContractAddress(
-        formData.contractAddress
+        localFormData.contractAddress
       );
       if (!isValidContractAddress) {
         valid = false;
@@ -279,19 +284,38 @@ const BetaForm = () => {
     e.preventDefault();
     setLoading(true);
 
+    const startingDateTimestamp =
+      new Date(localFormData.startingDate).getTime() / 1000;
+    const endingDateTimestamp =
+      new Date(localFormData.endingDate).getTime() / 1000;
+
+    if (isNaN(startingDateTimestamp) || isNaN(endingDateTimestamp)) {
+      console.error("Invalid date format");
+      return;
+    }
+
+    const betaFormParam = {
+      contractAddress: localFormData.contractAddress,
+      targetNumbersOfTester: localFormData.targetNumberOfTesters,
+      testingGoal: localFormData.testingGoal,
+      goals: localFormData.goals,
+      startingDate: Math.floor(startingDateTimestamp),
+      endingDate: Math.floor(endingDateTimestamp),
+      featureLoomLink: localFormData.loomLink,
+    };
+
+    const betaTestingAvailable = true;
+
     try {
       const tx = await writeContractAsync({
-        abi: ProductfindrABI,
-        address: ProductfindrAddress,
-        functionName: "storeBetaTestingData",
+        abi: ProductFindRMainABI,
+        address: ProductFindRMainAddress,
+        functionName: "registerProduct",
         args: [
-          formData.productName,
-          formData.targetNumberOfTesters,
-          formData.testingGoal,
-          formData.loomLink,
-          formData.goals,
-          formData.startingDate,
-          formData.endingDate,
+          account.address,
+          globalFormData,
+          betaTestingAvailable,
+          betaFormParam,
         ],
       });
 
@@ -345,7 +369,7 @@ const BetaForm = () => {
                   required
                   className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
                   placeholder="Type the name of the product here"
-                  value={formData.productName}
+                  value={localFormData.productName}
                   onChange={handleChange}
                 />{" "}
                 {errors.productName && (
@@ -371,7 +395,7 @@ const BetaForm = () => {
                   required
                   className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
                   placeholder="Copy the CA of the product"
-                  value={formData.contractAddress}
+                  value={localFormData.contractAddress}
                   onChange={handleChange}
                 />{" "}
                 {errors.contractAddress && (
@@ -397,7 +421,7 @@ const BetaForm = () => {
                   required
                   className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
                   placeholder="input the numbers of testers you are targeting"
-                  value={formData.targetNumberOfTesters}
+                  value={localFormData.targetNumberOfTesters}
                   onChange={handleChange}
                 />{" "}
                 <span className="flex justify-start mt-2 sm:text-xs md:text-base">
@@ -426,7 +450,7 @@ const BetaForm = () => {
                   required
                   className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
                   placeholder="input the main goal for the product beta testing"
-                  value={formData.testingGoal}
+                  value={localFormData.testingGoal}
                   onChange={handleChange}
                 />{" "}
                 {errors.testingGoal && (
@@ -442,7 +466,7 @@ const BetaForm = () => {
                   htmlFor="loomLink"
                   className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
                 >
-                  Loom Demo Link🔗{" "}
+                  Loom video link for feature demonstration🔗{" "}
                   <span className="text-[#9B30FF] pl-2"> * </span>{" "}
                 </label>{" "}
                 <input
@@ -451,8 +475,8 @@ const BetaForm = () => {
                   name="loomLink"
                   required
                   className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
-                  placeholder="insert a link for the interactive demo"
-                  value={formData.loomLink}
+                  placeholder="Insert Loom video link for feature demonstration"
+                  value={localFormData.loomLink}
                   onChange={handleChange}
                 />{" "}
                 {errors.loomLink && (
@@ -481,7 +505,7 @@ const BetaForm = () => {
                       name="goals"
                       value="Usability test"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("Usability test")}
+                      checked={localFormData.goals.includes("Usability test")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal1"> Usability test </label>{" "}
@@ -493,7 +517,7 @@ const BetaForm = () => {
                       name="goals"
                       value="Bug reporting"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("Bug reporting")}
+                      checked={localFormData.goals.includes("Bug reporting")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal2"> Bug reporting </label>{" "}
@@ -505,7 +529,7 @@ const BetaForm = () => {
                       name="goals"
                       value="User interface"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("User interface")}
+                      checked={localFormData.goals.includes("User interface")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal3"> User interface </label>{" "}
@@ -517,7 +541,7 @@ const BetaForm = () => {
                       name="goals"
                       value="User experience"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("User experience")}
+                      checked={localFormData.goals.includes("User experience")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal4"> User experience </label>{" "}
@@ -529,7 +553,7 @@ const BetaForm = () => {
                       name="goals"
                       value="Feature feedback"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("Feature feedback")}
+                      checked={localFormData.goals.includes("Feature feedback")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal5"> Feature feedback </label>{" "}
@@ -541,7 +565,7 @@ const BetaForm = () => {
                       name="goals"
                       value="Others"
                       className="border-[1px] border-[#9B30FF] text-[#9B30FF]"
-                      checked={formData.goals.includes("Others")}
+                      checked={localFormData.goals.includes("Others")}
                       onChange={handleCheckboxChange}
                     />{" "}
                     <label htmlFor="goal6"> Others </label>{" "}
@@ -570,7 +594,7 @@ const BetaForm = () => {
                       name="startingDate"
                       placeholder="Select starting date"
                       className="bg-transparent mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
-                      value={formData.startingDate}
+                      value={localFormData.startingDate}
                       onChange={handleChange}
                     />
                     {errors.startingDate && (
@@ -593,7 +617,7 @@ const BetaForm = () => {
                       name="endingDate"
                       placeholder="Select ending date"
                       className="bg-transparent mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
-                      value={formData.endingDate}
+                      value={localFormData.endingDate}
                       onChange={handleChange}
                     />
                     {errors.endingDate && (
@@ -630,8 +654,8 @@ const BetaForm = () => {
                       Congratulations🎉{" "}
                     </h2>{" "}
                     <p className="text-lg">
-                      {formData.productName}&nbsp;have successfully applied for
-                      beta testing program
+                      {localFormData.productName}&nbsp;have successfully applied
+                      for beta testing program
                     </p>
                     <Image
                       src={TimerIcon}

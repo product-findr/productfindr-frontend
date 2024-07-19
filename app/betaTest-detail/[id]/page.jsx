@@ -4,8 +4,6 @@ import ProductNavbar from "@/components/ProductNavbar";
 import { useWriteContract, useAccount } from "wagmi";
 import { useReadContract } from "wagmi";
 import { convertEmbedLink } from "@/utils/utils";
-import { config } from "@/config/wagmi";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import {
   ProductFindRMainAddress,
   ProductFindRMainABI,
@@ -13,20 +11,19 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import LeftArrowIcon from "../../assets/icons/LeftArrowIcon.svg";
-import VectorIcon from "../../assets/icons/vector.png";
 import LinkIcon from "../../assets/icons/Link.png";
 import Notification from "@/components/Notification";
+import AddReview from "@/components/AddReview";
 import stack from "@/stacks/stacks";
 import "../../styles//Product.css";
 
-const ProductDetail = ({ params: { id } }) => {
+const BetaTestingDetails = ({ params: { id } }) => {
   const { writeContractAsync } = useWriteContract();
   const { address: account } = useAccount();
 
   const [fetchedProductDetails, setFetchedProductDetails] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const [voting, setVoting] = useState(false);
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
@@ -39,48 +36,11 @@ const ProductDetail = ({ params: { id } }) => {
     args: [id],
   });
 
-  const handleUpvote = async () => {
-    setVoting(true);
-    try {
-      const tx = await writeContractAsync({
-        abi: ProductFindRMainABI,
-        address: ProductFindRMainAddress,
-        functionName: "upvoteProduct",
-        args: [id, account],
-      });
-
-      const transactionReceipt = await waitForTransactionReceipt(config, {
-        hash: tx,
-      });
-
-      if (transactionReceipt.status === "success") {
-        const addPoints = await stack.track("upvote", {
-          points: 5,
-          account: account,
-          uniqueId: account,
-        });
-
-        console.log("Added Points: ", addPoints.status);
-      }
-      if (tx && tx !== "undefined") {
-        setNotificationMessage("Upvote transaction success.");
-        setNotificationType("success");
-        setShowNotification(true);
-        setVoting(false);
-      } else {
-        setVoting(false);
-        console.log("error");
-      }
-    } catch (error) {
-      if (error.message.includes("Connector not connected.")) {
-        setNotificationMessage("Please connect your wallet to proceed.");
-        setNotificationType("warning");
-        setShowNotification(true);
-        setVoting(false);
-      }
-      console.error("Error upvoting product: ", error.message);
-      setVoting(false);
-    }
+  const formatDate = (timestamp) => {
+    // Convert BigInt to Number
+    const timestampNumber = Number(timestamp);
+    const date = new Date(timestampNumber * 1000);
+    return date.toLocaleDateString();
   };
 
   useEffect(() => {
@@ -100,7 +60,7 @@ const ProductDetail = ({ params: { id } }) => {
       <div className="container mx-auto px-4 py-8">
         <Link
           className="flex items-center text-lg text-gray-800 hover:text-[#9B30FF]"
-          href="/products"
+          href="/beta-products"
         >
           <div className="bg-transparent border border-[#9B30FF] rounded-full flex items-center justify-center w-12 h-12 mr-4">
             <Image
@@ -144,7 +104,8 @@ const ProductDetail = ({ params: { id } }) => {
             <>
               <main className="col-span-1 md:col-span-3 bg-white p-4 md:block">
                 {fetchedProductDetails.map((item, index) => {
-                  const { product } = item;
+                  console.log("Product Details: ", fetchedProductDetails);
+                  const { product, betaTestingDetails } = item;
                   const { id, upvotes, details } = product;
 
                   const {
@@ -153,14 +114,17 @@ const ProductDetail = ({ params: { id } }) => {
                     tagLine,
                     productLink,
                     description,
-                    mediaFile,
-                    loomLink,
-                    twitterLink,
-                    pricingOption,
-                    offer,
-                    promoCode,
-                    expirationDate,
+                    betaTestingLink,
                   } = details;
+
+                  const {
+                    contractAddress,
+                    goals,
+                    startingDate,
+                    endingDate,
+                    featureLoomLink,
+                    testingGoal,
+                  } = betaTestingDetails;
 
                   return (
                     <div
@@ -193,19 +157,6 @@ const ProductDetail = ({ params: { id } }) => {
                             </div>
                           </div>
                         </div>
-                        <div
-                          className="bg-[#2828280D] flex justify-between p-4 rounded-xl"
-                          onClick={handleUpvote}
-                        >
-                          <Image
-                            src={VectorIcon}
-                            alt="vector"
-                            className="rounded-lg"
-                          />
-                          <span className="text-gray=200 ml-2">
-                            {voting ? "..." : upvotes.toString()}
-                          </span>
-                        </div>
                       </div>
                       <div className="border-t border-[#9B30FF] my-4"></div>
                       <p className="font-semibold text-start text-2xl mt-8">
@@ -213,25 +164,39 @@ const ProductDetail = ({ params: { id } }) => {
                       </p>
                       <p className="spacious-text">{description}</p>
                       <p className="font-bold text-start text-2xl mt-8">
-                        Gallery
+                        Contract Address ✅
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-                        <div className="col-span-1">
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${mediaFile}`}
-                            alt="Gallery Image 1"
-                            className="rounded-lg"
-                            width={300}
-                            height={200}
-                          />
-                        </div>
+                      <p
+                        className="text-gray-600 text-sm"
+                        style={{ marginTop: "20px" }}
+                      >
+                        {contractAddress}
+                      </p>
+                      <p className="font-semibold text-start text-2xl mt-8">
+                        Goals Beta Testing
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+                        {goals.map((goal, index) => (
+                          <div
+                            key={index}
+                            className="bg-[#90EE90] font-semibold text-gray-800 text-sm p-2 rounded-md text-center"
+                          >
+                            {goal}
+                          </div>
+                        ))}
                       </div>
-                      <p className="font-bold text-start text-2xl mt-8">
-                        Video
+                      <p className="font-semibold text-start text-2xl mt-8">
+                        New Features to Test
                       </p>
-                      <div className="loomVideo">
+                      <p className="mt-4 text-gray-700 text-base leading-relaxed">
+                        {testingGoal}
+                      </p>
+                      <p className="font-bold text-start text-2xl mt-8">
+                        Beta Testing Guide
+                      </p>
+                      <div className="featureLoomLink mt-4">
                         <iframe
-                          src={`${convertEmbedLink(loomLink)}`}
+                          src={`${convertEmbedLink(featureLoomLink)}`}
                           frameBorder="0"
                           allowFullScreen
                           style={{
@@ -243,46 +208,44 @@ const ProductDetail = ({ params: { id } }) => {
                           }}
                         ></iframe>
                       </div>
-                      <p className="text-[#282828] mt-8">
-                        Loom Video Link 🔗{" "}
-                        <a
-                          href={`${loomLink}`}
-                          className="text-[#9B30FF] hover:underline"
-                        >
-                          watch
-                        </a>
-                      </p>
                       <p className="font-bold text-start text-2xl mt-8">
-                        Social Links 🔗
+                        Testing Period
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-700 mt-4">
+                        <div className="flex flex-col">
+                          <span className="text-gray-800 font-semibold mb-1">
+                            Start Date
+                          </span>
+                          <span className="text-lg">
+                            {formatDate(startingDate)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-800 font-semibold mb-1">
+                            End Date
+                          </span>
+                          <span className="text-lg">
+                            {formatDate(endingDate)}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-start text-2xl mt-8">
+                        Beta Test App
                       </p>
                       <a
-                        href={`${twitterLink}`}
-                        className="text-[#9B30FF] text-sm hover:underline"
-                        style={{ marginTop: "20px" }}
+                        href={`${betaTestingLink}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 text-gray-700 text-base leading-relaxed underline hover:text-blue-600"
                       >
-                        Twitter/X Link
+                        Click Here
                       </a>
-                      <h2 className="font-bold text-start text-2xl mt-8">
-                        Special Offer
-                      </h2>
-                      {pricingOption === "free" ? (
-                        <p className="text-gray-600">
-                          No special offer for this product.
-                        </p>
+                      {account !== undefined ? (
+                        <AddReview id={id} />
                       ) : (
-                        <>
-                          <p className="text-gray-600 mb-1">
-                            Use promo code{" "}
-                            <span className="font-bold text-[#9B30FF]">
-                              {promoCode}
-                            </span>{" "}
-                            for 20% off!
-                          </p>
-                          <p className="text-gray-500">
-                            Expires on{" "}
-                            <span className="font-bold">{expirationDate}</span>
-                          </p>
-                        </>
+                        <p className="text-lg text-center font-semibold text-red-600 bg-white p-4 rounded shadow mt-8">
+                          Please connect your account to add a review.
+                        </p>
                       )}
                     </div>
                   );
@@ -332,4 +295,4 @@ const ProductDetail = ({ params: { id } }) => {
   );
 };
 
-export default ProductDetail;
+export default BetaTestingDetails;
