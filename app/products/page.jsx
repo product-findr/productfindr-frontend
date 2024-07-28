@@ -51,7 +51,7 @@ const ProductPage = () => {
         const addPoints = await stack.track("upvote", {
           points: 5,
           account: account,
-          uniqueId: account,
+          uniqueId: `${account} - ${id}`,
         });
         console.log("Added Points: ", addPoints.status);
       }

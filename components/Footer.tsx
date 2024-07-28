@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import ProductfindrLogo from "../app/assets/productfindr.png"; 
+import ProductfindrLogo from "../app/assets/productfindr.png";
 
 const Footer: React.FC = () => {
   return (
@@ -13,14 +13,23 @@ const Footer: React.FC = () => {
           </div>
           <div className="mt-4">
             <h2 className="text-xl md:text-2xl font-bold mb-2">Social Links</h2>
-            <a href="https://twitter.com" className="text-gray-400 block text-sm">
+            <a
+              href="https://x.com/productfindr_"
+              className="text-gray-400 block text-sm"
+            >
               Twitter
             </a>
-            <a href="https://facebook.com" className="text-gray-400 block text-sm">
-              Instagram
+            <a
+              href="https://t.me/+n8-81UFthoAwYzM0"
+              className="text-gray-400 block text-sm"
+            >
+              Telegram
             </a>
-            <a href="https://instagram.com" className="text-gray-400 block text-sm">
-              Tik Tok
+            <a
+              href="mailto:officialproductfindr@gmail.com"
+              className="text-gray-400 block text-sm"
+            >
+              Mail Us
             </a>
           </div>
         </div>

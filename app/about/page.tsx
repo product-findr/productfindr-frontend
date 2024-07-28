@@ -4,7 +4,6 @@ import Image from "next/image";
 
 import TeamMember1 from "../assets/teams/idris.jpg";
 import TeamMember2 from "../assets/teams/isreal1.png";
-import TeamMember3 from "../assets/teams/dami.png";
 import TeamMember4 from "../assets/teams/Mame.jpeg";
 import Quote from "../assets/icons/quote.png";
 import Navbar from "../../components/Navbar";
@@ -119,7 +118,7 @@ const Page = () => {
         </h2>
         <div className="flex flex-wrap -mx-4 py-4">
           {/* Team Member 1 */}
-          <div className="w-full md:w-1/4 px-4 mb-8">
+          <div className="w-full md:w-1/3 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
               <Image
                 src={TeamMember1}
@@ -142,7 +141,7 @@ const Page = () => {
           </div>
 
           {/* Team Member 2 */}
-          <div className="w-full md:w-1/4 px-4 mb-8">
+          <div className="w-full md:w-1/3 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
               <Image
                 src={TeamMember2}
@@ -164,33 +163,9 @@ const Page = () => {
             </div>
           </div>
 
-          {/* Team Member 3 */}
-          <div className="w-full md:w-1/4 px-4 mb-8">
-            <div className="border border-gray-300 rounded-lg p-6 text-center">
-              <Image
-                src={TeamMember3}
-                alt="Idris"
-                className="rounded-md mb-6"
-              />
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold mb-4">
-                  Damilare Aregbesola
-                </h3>
-                <p className="text-gray-600">Marketing and Strategy</p>
-              </div>
-              <a
-                href="https://x.com/Sir_Damilare"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#9B30FF] hover:underline"
-              >
-                Sir_Damilare
-              </a>
-            </div>
-          </div>
 
-          {/* Team Member 4 */}
-          <div className="w-full md:w-1/4 px-4 mb-8">
+          {/* Team Member 3 */}
+          <div className="w-full md:w-1/3 px-4 mb-8">
             <div className="border border-gray-300 rounded-lg p-6 text-center">
               <Image
                 src={TeamMember4}

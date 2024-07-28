@@ -45,9 +45,34 @@ const AddReview = ({ id }) => {
       setError("Please enter a review and select a rating.");
       return;
     }
-
+  
     setError("");
     setReviewing(true);
+    const prompt = `Is the message below a valid feedback? - ${reviewText}. Return true or false nothing more.`;
+  
+    const response = await fetch("/api/evaluate-feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+  
+    if (!response.ok) {
+      console.error("Error:", response.statusText);
+      setReviewing(false);
+      return;
+    }
+  
+    const data = await response.json();
+    const isValidFeedback = data.choices[0].message.content.trim() === "true";
+  
+    if (!isValidFeedback) {
+      setError("Oops! We need a valid review. Your feedback helps improve this product. Please try again.");
+      setReviewing(false);
+      return;
+    }
+  
     try {
       const tx = await writeContractAsync({
         abi: ProductFindRMainABI,
@@ -55,18 +80,18 @@ const AddReview = ({ id }) => {
         functionName: "addReview",
         args: [account, parseInt(id), reviewText, rating],
       });
-
+  
       const transactionReceipt = await waitForTransactionReceipt(config, {
         hash: tx,
       });
-
+  
       if (transactionReceipt.status === "success") {
         const addPoints = await stack.track("addReview", {
           points: 15,
           account: account,
-          uniqueId: account,
+          uniqueId: `${account} -${id}`,
         });
-
+  
         console.log("Added Points: ", addPoints.status);
         setNotificationMessage("Review has been added!");
         setNotificationType("success");
@@ -77,10 +102,11 @@ const AddReview = ({ id }) => {
     } finally {
       setReviewing(false);
     }
-
+  
     setReviewText("");
     setRating(0);
   };
+  
 
   const formatDate = (timestamp) => {
     const date = new Date(Number(timestamp) * 1000); // Convert Unix timestamp to milliseconds

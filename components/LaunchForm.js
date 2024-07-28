@@ -12,6 +12,7 @@ import Image from "next/image";
 import {
   ProductFindRMainAddress,
   ProductFindRMainABI,
+  ProductAddress,
 } from "@/constant/constant";
 import stack from "@/stacks/stacks";
 
@@ -345,7 +346,7 @@ const LaunchForm = () => {
           const addPoints = await stack.track("product_launch", {
             points: 10,
             account: account.address,
-            uniqueId: account.address,
+            uniqueId: `${account.address} - ${ProductAddress}`,
           });
           console.log("Add Points: ", addPoints.success === "true");
           setSuccess(true);

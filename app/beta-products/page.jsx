@@ -189,12 +189,9 @@ const BetaProducts = () => {
                       />
                     </div>
                     <div className="flex flex-col flex-grow">
-                      <Link
-                        href={`/productDetails/${id}/`}
-                        className="text-xl font-bold mb-1 hover:underline"
-                      >
+                      <p className="text-xl font-bold mb-1">
                         {productName}
-                      </Link>
+                      </p>
                       <span className="text-[#9B30FF]">⭐⭐⭐⭐⭐</span>
                     </div>
                     <div className="flex flex-col justify-center">

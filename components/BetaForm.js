@@ -12,6 +12,7 @@ import { waitForTransactionReceipt } from "wagmi/actions";
 import {
   ProductFindRMainAddress,
   ProductFindRMainABI,
+  ProductAddress,
 } from "@/constant/constant";
 import { usdToETH } from "@/utils/utils";
 import stack from "@/stacks/stacks";
@@ -327,7 +328,7 @@ const BetaForm = () => {
         const addPoints = await stack.track("beta_testing", {
           points: 20,
           account: account.address,
-          uniqueId: account.address,
+          uniqueId: `${account.address} - ${ProductAddress}`,
         });
         console.log("Add Points: ", addPoints.success === "true");
         setSuccess(true);
