@@ -9,11 +9,8 @@ const HeroSection: React.FC = () => {
         </span>
 
         <div className="text-center">
-          <h2 className="gradient-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold sm:mb-4">
-            Search smarter, find
-          </h2>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold m-0 sm:m-4">
-            <span className="gradient-text">better, earn BIGGER</span> 💸
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold sm:mb-4">
+          <span className="gradient-text">Launch, Test & Earn!</span> 💸
           </h2>
           <div className="py-4">
             <span className="block text-xs sm:text-sm md:text-base lg:text-lg font-light text-white">

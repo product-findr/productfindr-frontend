@@ -35,12 +35,11 @@ const Testimonial: React.FC = () => {
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <div className="bg-white shadow-lg p-4 rounded-2xl flex flex-col h-full">
             <p className="text-base sm:text-lg text-[#282828] text-center">
-              “We had an exclusive beta testing of new payment feature using
-              ProductfindR.”
+              “I love this! Beta test to earn - is something all web3 projects should do to incentivize early beta users”
             </p>
 
             <div className="mt-16 text-left">
-              <span className="font-semibold text-gray-900">Stripe</span>
+              <span className="font-semibold text-gray-900">Jose_BlueSocial</span>
             </div>
             <div className="mt-4 flex justify-left">
               <span className="text-yellow-400 text-2xl">★★★★★</span>
