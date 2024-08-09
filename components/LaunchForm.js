@@ -15,6 +15,7 @@ import {
   ProductAddress,
 } from "@/constant/constant";
 import stack from "@/stacks/stacks";
+import Notification from "./Notification";
 
 const LaunchForm = () => {
   const { formData: globalFormData, setFormData } = useContext(FormDataContext);
@@ -31,7 +32,7 @@ const LaunchForm = () => {
     loomLink: "",
     workedWithTeam: false,
     teamMembersInput: "",
-    pricingOption: "",
+    pricingOption: "free",
     offer: "",
     promoCode: "",
     expirationDate: "",
@@ -55,10 +56,14 @@ const LaunchForm = () => {
 
   const { writeContractAsync } = useWriteContract();
 
-  const router =useRouter();
+  const router = useRouter();
 
   const account = useAccount();
   const connectionStatus = account.status;
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("");
 
   const isValidUrl = (urlString) => {
     try {
@@ -239,21 +244,32 @@ const LaunchForm = () => {
     });
 
     if (valid) setStep(2);
-    const part2Field = ["thumbNail", "mediaFile", "loomLink"];
 
-    let valid2 = true;
-    part2Field.forEach((field) => {
-      const error = validateField(field, localFormData[field] || "");
-      if (error) valid2 = false;
-    });
-    if (valid2) setStep(3);
-    const part3Field = ["teamMembersInput"];
-    let valid3 = true;
-    part3Field.forEach((field) => {
-      const error = validateField(field, localFormData[field] || "");
-      if (error) valid3 = false;
-    });
-    if (valid3) setStep(4);
+    if (step === 2) {
+      const part2Fields = ["thumbNail", "mediaFile", "loomLink"];
+
+      let valid2 = true;
+      part2Fields.forEach((field) => {
+        const error = validateField(field, localFormData[field] || "");
+        if (error) valid2 = false;
+      });
+
+      if (valid2) setStep(3);
+    }
+
+    if (step === 3) {
+      const part3Fields = ["teamMembersInput"];
+      let valid3 = true;
+
+      if (localFormData.workedWithTeam) {
+        part3Fields.forEach((field) => {
+          const error = validateField(field, localFormData[field] || "");
+          if (error) valid3 = false;
+        });
+      }
+
+      if (valid3) setStep(4);
+    }
   };
 
   const handleSubmitLaunch = async (e) => {
@@ -272,11 +288,7 @@ const LaunchForm = () => {
       "thumbNail",
       "mediaFile",
       "loomLink",
-      "teamMembersInput",
       "pricingOption",
-      "offer",
-      "promoCode",
-      "expirationDate",
     ];
 
     let isValid = true;
@@ -286,7 +298,9 @@ const LaunchForm = () => {
     });
 
     if (!isValid) {
-      alert("Please fill out all required fields correctly.");
+      setNotificationMessage("Please fill out all required fields correctly.");
+      setNotificationType("warning");
+      setShowNotification(true);
       return;
     }
 
@@ -352,12 +366,16 @@ const LaunchForm = () => {
           setSuccess(true);
           setLaunch(false);
         } else {
-          alert("Failed to list product. Please try again.");
+          setNotificationMessage("Failed to list product. Please try again.");
+          setNotificationType("error");
+          setShowNotification(true);
           setLaunch(false);
         }
       } catch (error) {
         console.error("Failed Tx", error);
-        alert("Failed to list product. Please try again.");
+        setNotificationMessage("Failed to list product. Please try again.");
+        setNotificationType("error");
+        setShowNotification(true);
         setLaunch(false);
       }
     }
@@ -715,12 +733,13 @@ const LaunchForm = () => {
                       setLocalFormData({
                         ...localFormData,
                         workedWithTeam: false,
+                        teamMembersInput: "", // Clear the team members input if they worked alone
                       })
                     }
                     className="form-radio h-4 w-4 text-gray-700 transition duration-150 ease-in-out mr-2"
                     required
                   />
-                  Yes, i worked on building the product alone
+                  Yes, I worked on building the product alone
                 </label>
                 <label className="mb-2">
                   <input
@@ -743,30 +762,32 @@ const LaunchForm = () => {
               </div>
               {errors.workedWithTeam && <p> {errors.workedWithTeam} </p>}
             </div>
-            <div>
-              <label
-                htmlFor="teamMembersInput"
-                className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
-              >
-                Who worked on this project👥
-                <span className="text-[#9B30FF] pl-2"> * </span>
-              </label>
-              <input
-                type="text"
-                id="teamMembersInput"
-                name="teamMembersInput"
-                value={localFormData.teamMembersInput}
-                onChange={handleChange}
-                required
-                className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
-                placeholder="Kindly add anyone who worked on this product"
-              />
-              {errors.teamMembersInput && (
-                <p className="text-red-500 text-xs md:text-sm">
-                  {errors.teamMembersInput}{" "}
-                </p>
-              )}
-            </div>
+
+            {localFormData.workedWithTeam === true && (
+              <div>
+                <label
+                  htmlFor="teamMembersInput"
+                  className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base"
+                >
+                  Who worked on this project👥
+                  <span className="text-[#9B30FF] pl-2"> * </span>
+                </label>
+                <input
+                  type="text"
+                  id="teamMembersInput"
+                  name="teamMembersInput"
+                  value={localFormData.teamMembersInput}
+                  onChange={handleChange}
+                  className="bg-transparent mt-1 block w-full border border-[#282828] rounded-2xl pl-4 h-14 sm:text-xs md:text-base"
+                  placeholder="Kindly add anyone who worked on this product"
+                />
+                {errors.teamMembersInput && (
+                  <p className="text-red-500 text-xs md:text-sm">
+                    {errors.teamMembersInput}{" "}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="text-right">
               <button
@@ -860,7 +881,7 @@ const LaunchForm = () => {
                           </span>
                         </label>
                         <p className="text-sm text-gray-500 ml-6">
-                          This product requires payment and there&apos;s no free
+                          This product requires payment and there's no free
                           coupon
                         </p>
                       </div>
@@ -887,68 +908,73 @@ const LaunchForm = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-start mb-6">
-                  <p className="font-bold text-md text-gray-600 mb-8">
-                    Promo code 🆓
-                  </p>
-                  <p className="text-md text-gray-600 mb-8">
-                    If you’d like to offer a promo code for the ProductfindR
-                    community, you can add it here.
-                  </p>
-                  <div className="flex flex-wrap space-x-4">
-                    <div className="flex-1">
-                      <label
-                        className="block text-sm font-bold text-gray-700 mb-2"
-                        htmlFor="offer"
-                      >
-                        What is the offer
-                      </label>
-                      <input
-                        type="text"
-                        id="offer"
-                        name="offer"
-                        placeholder="2 months free"
-                        value={localFormData.offer}
-                        onChange={handleChange}
-                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
-                      />
+
+                  {/* Conditionally render the promo code section */}
+                  {(localFormData.pricingOption === "paid" ||
+                    localFormData.pricingOption === "paidWithTrial") && (
+                    <div className="text-start mb-6">
+                      <p className="font-bold text-md text-gray-600 mb-8">
+                        Promo code 🆓
+                      </p>
+                      <p className="text-md text-gray-600 mb-8">
+                        If you’d like to offer a promo code for the ProductfindR
+                        community, you can add it here.
+                      </p>
+                      <div className="flex flex-wrap space-x-4">
+                        <div className="flex-1">
+                          <label
+                            className="block text-sm font-bold text-gray-700 mb-2"
+                            htmlFor="offer"
+                          >
+                            What is the offer
+                          </label>
+                          <input
+                            type="text"
+                            id="offer"
+                            name="offer"
+                            placeholder="2 months free"
+                            value={localFormData.offer}
+                            onChange={handleChange}
+                            className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label
+                            className="block text-sm font-bold text-gray-700 mb-2"
+                            htmlFor="promoCode"
+                          >
+                            Promo code
+                          </label>
+                          <input
+                            type="text"
+                            id="promoCode"
+                            name="promoCode"
+                            placeholder="PFR300WWW"
+                            value={localFormData.promoCode}
+                            onChange={handleChange}
+                            className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label
+                            className="block text-sm font-bold text-gray-700 mb-2"
+                            htmlFor="expirationDate"
+                          >
+                            Expiration dates
+                          </label>
+                          <input
+                            type="date"
+                            id="expirationDate"
+                            name="expirationDate"
+                            placeholder="None"
+                            value={localFormData.expirationDate}
+                            onChange={handleChange}
+                            className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <label
-                        className="block text-sm font-bold text-gray-700 mb-2"
-                        htmlFor="promoCode"
-                      >
-                        Promo code
-                      </label>
-                      <input
-                        type="text"
-                        id="promoCode"
-                        name="promoCode"
-                        placeholder="PFR300WWW"
-                        value={localFormData.promoCode}
-                        onChange={handleChange}
-                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label
-                        className="block text-sm font-bold text-gray-700 mb-2"
-                        htmlFor="expirationDate"
-                      >
-                        Expiration dates
-                      </label>
-                      <input
-                        type="date"
-                        id="expirationDate"
-                        name="expirationDate"
-                        placeholder="None"
-                        value={localFormData.expirationDate}
-                        onChange={handleChange}
-                        className="bg-[#ECECEC] mt-1 block w-full border-[1px] border-[#282828] rounded-3xl py-2 px-3 text-gray-700"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-md font-bold text-gray-700 mb-4 sm:text-xs md:text-base">
@@ -1016,6 +1042,13 @@ const LaunchForm = () => {
               </>
             )}
           </>
+        )}
+        {showNotification && (
+          <Notification
+            message={notificationMessage}
+            onClose={() => setShowNotification(false)}
+            type={notificationType}
+          />
         )}
       </form>
     </div>
